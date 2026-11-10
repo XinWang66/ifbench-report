@@ -290,10 +290,10 @@ main{position:relative;z-index:2}
 .lat.ok h4{color:#15803d}
 
 /* table */
-.tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;margin-top:8px}
+.tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:12.5px;margin-top:6px}
 .tbl thead th{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:#8496ad;text-align:left;font-weight:500;
-  padding:10px 14px;border-bottom:1px solid rgba(19,64,120,.14);white-space:nowrap}
-.tbl tbody td{padding:13px 14px;border-bottom:1px solid #eef3fb;color:#3a506b;vertical-align:middle}
+  padding:9px 12px;border-bottom:1px solid rgba(19,64,120,.14);white-space:nowrap}
+.tbl tbody td{padding:9px 12px;border-bottom:1px solid #eef3fb;color:#3a506b;vertical-align:middle}
 .tbl tbody tr:hover td{background:#f5faff}
 .tbl tbody tr:last-child td{border-bottom:0}
 .tbl .model{font-family:var(--mono);font-size:12.5px;color:#0b2a45}
@@ -471,7 +471,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
           <div class="k">02</div>
           <div>
             <h3>头部模型的能力与生成延迟严重脱节</h3>
-            <p>Kimi 两强在 900 秒超时 × 3 次重试的宽容条件下仍有 <strong>7%~12%</strong> 的题目拿不到回复，而能力较弱的 GLM、Qwen、DeepSeek 全系零超时 —— 能力榜与稳定榜必须分开看。</p>
+            <p>Kimi 系列两个跑次在 900 秒超时 × 3 次重试的宽容条件下仍有 <strong>7%~12%</strong> 的题目拿不到回复，而能力较弱的 GLM、Qwen、DeepSeek 全系零超时 —— 能力榜与稳定榜必须分开看。</p>
           </div>
         </div>
         <div class="concl reveal">
@@ -562,7 +562,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
         <div class="rank-head"><span>#</span><span>模型</span><span>得分分布</span><span>得分</span><span>有效回复</span><span>超时率</span></div>
         <div id="rankRows"></div>
         <div class="legend" id="famLegend"></div>
-        <p class="note">注：榜单按当前所选指标实时排序。超时题目按不通过计分，含超时的跑次分数为<strong>下界</strong>；完整跑次（超时率 0%）分数无偏差。qwen3.7-plus 复跑结果（50.3%）与主跑次（50.7%）仅差 0.4 分，榜单只保留主跑次。</p>
+        <p class="note">注：榜单按当前所选指标实时排序。超时题目按不通过计分，含超时的跑次分数为<strong>下界</strong>；完整跑次（超时率 0%）分数无偏差。</p>
       </div>
 
       <div class="tier-wrap">
@@ -570,7 +570,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
           <h3 style="font-size:15px;margin:26px 0 12px;color:#0b2a45">梯队结构</h3>
           <div class="tier" style="--c:#0b93b8">
             <div class="tier-top"><b>第一梯队</b><span>66% – 73%</span></div>
-            <p>Kimi K3 两兄弟与 MiniMax-M2.5。榜面分数咬得极近（73.0 / 72.3 / 71.3），但含义不同 —— Kimi 两个跑次首轮分别有 61 与 31 条空回复，经 600 秒 × 3 重试、4 并发 900 秒两轮补跑后仍残留 37 与 22 条，空回复按不通过计，得分被系统性拉低；MiniMax 为完整跑次，分数无水分。</p>
+            <p>Kimi K3 系列的两个跑次与 MiniMax-M2.5。榜面分数咬得极近（73.0 / 72.3 / 71.3），但含义不同 —— Kimi 两个跑次首轮分别有 61 与 31 条空回复，经 600 秒 × 3 重试、4 并发 900 秒两轮补跑后仍残留 37 与 22 条，空回复按不通过计，得分被系统性拉低；MiniMax 为完整跑次，分数无水分。</p>
             <div class="chips"><span>kimi-k3.1-pro</span><span>kimi-k3</span><span>MiniMax-M2.5</span></div>
           </div>
           <div class="tier" style="--c:#7455f5">
@@ -593,7 +593,6 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
             <div class="box">修正得分<b style="color:#15803d">83.3%</b></div>
           </div>
           <p>仅按已成功回复且可评分的题目计算正确率：kimi-k3.1-pro 为 83.3%（216/259），kimi-k3 为 78.0%（217/278）。即使保守估计（超时题目多为要求长输出的高难度题，补齐后得分会打折），K3 系列补齐后的真实水平大概率落在 <strong>75%~80%</strong> 区间，kimi-k3.1-pro 很可能实际登顶。</p>
-          <p style="margin-top:10px">据此建议采用<strong>双口径呈现</strong>：严格口径下三强同档；能力口径下 Kimi 断档领先。两种口径的差值，本身就是「生成延迟成本」的量化。</p>
         </div>
       </div>
     </div>
@@ -762,20 +761,21 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
         </div>
       </div>
 
-      <div class="tbl-wrap reveal" style="margin-top:18px">
+      <div class="tbl-wrap reveal" style="margin-top:14px">
         <table class="tbl">
-          <thead><tr><th>模型</th><th>第 1 轮 · 300s</th><th>第 2 轮 · 600s × 3 重试</th><th>第 3 轮 · 4 并发 · 900s</th><th>评价</th></tr></thead>
+          <thead><tr><th>模型</th><th>首轮 · 300s</th><th>二轮 · 600s × 3 重试</th><th>三轮 · 4 并发 · 900s</th></tr></thead>
           <tbody>
-            <tr><td class="model">kimi-k3.1-pro</td><td class="mono">61 条（20.3%）</td><td class="mono">41 条</td><td class="bad mono">37 条（12.3%）</td><td>延迟最重，长输出题目会被极端拖慢</td></tr>
-            <tr><td class="model">kimi-k3</td><td class="mono">31 条（10.3%）</td><td class="mono">25 条</td><td class="bad mono">22 条（7.3%）</td><td>同样受长输出拖累，两轮补跑后收敛有限</td></tr>
-            <tr><td class="model">MiniMax-M2.5</td><td class="mono">95 条（31.7%）</td><td class="mono good">0 条</td><td class="mono good">0 条（完整）</td><td>依赖重试与超时预算，可用但需耐心</td></tr>
-            <tr><td class="model">glm-5.3 / qwen 全系 / deepseek 全系</td><td class="mono good">0</td><td class="mono good">0</td><td class="mono good">0</td><td>稳定性最好</td></tr>
+            <tr><td class="model">kimi-k3.1-pro</td><td class="mono">61 条（20.3%）</td><td class="mono">41 条</td><td class="bad mono">37 条（12.3%）</td></tr>
+            <tr><td class="model">kimi-k3</td><td class="mono">31 条（10.3%）</td><td class="mono">25 条</td><td class="bad mono">22 条（7.3%）</td></tr>
+            <tr><td class="model">MiniMax-M2.5</td><td class="mono">95 条（31.7%）</td><td class="mono good">0 条</td><td class="mono good">0 条（完整）</td></tr>
+            <tr><td class="model">glm-5.3 / qwen 全系 / deepseek 全系</td><td class="mono good">0</td><td class="mono good">0</td><td class="mono good">0</td></tr>
           </tbody>
         </table>
       </div>
+      <p class="note" style="margin-top:12px">kimi 两个跑次的延迟集中在长输出题目；MiniMax 依赖重试与超时预算；GLM / Qwen / DeepSeek 全系零超时。</p>
 
       <div class="glass card reveal" style="margin-top:16px;padding:24px">
-        <p style="margin:0;font-size:14px;color:#3a506b;line-height:1.9">本次评测最反直觉的一条结论：<strong>头部模型的精确指令遵循能力进步了，但生成延迟没有跟上。</strong>超时题目集中在要求长输出与精确字符操作的约束上 —— 恰是 IFBench 的高难度题。Kimi 两强首轮空回复 61 / 31 条，第二轮已回收大部分（41 / 25），第三轮把并发降到 4 后仅再回收 4 与 3 条，最终残留 37 / 22 条（12.3% / 7.3%）——瓶颈在单请求生成时长，而不是并发。MiniMax 首轮 95 条，第二轮即补齐归零。若以「300 题必须全部按时交卷」的部署口径衡量，能力最强的 Kimi 反而是可用性最差的。选型场景下：要分数选 Kimi，要可用性选 GLM / MiniMax；MiniMax 是唯一的平衡点（71.3% 且补跑后完整）。</p>
+        <p style="margin:0;font-size:14px;color:#3a506b;line-height:1.9">本次评测最反直觉的一条结论：<strong>头部模型的精确指令遵循能力进步了，但生成延迟没有跟上。</strong>超时题目集中在要求长输出与精确字符操作的约束上 —— 恰是 IFBench 的高难度题。Kimi 系列两个跑次首轮空回复 61 / 31 条，第二轮已回收大部分（41 / 25），第三轮把并发降到 4 后仅再回收 4 与 3 条，最终残留 37 / 22 条（12.3% / 7.3%）——瓶颈在单请求生成时长，而不是并发。MiniMax 首轮 95 条，第二轮即补齐归零。若以「300 题必须全部按时交卷」的部署口径衡量，能力最强的 Kimi 反而是可用性最差的。选型场景下：要分数选 Kimi，要可用性选 GLM / MiniMax；MiniMax 是唯一的平衡点（71.3% 且补跑后完整）。</p>
       </div>
     </div>
   </section>
