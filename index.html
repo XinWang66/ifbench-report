@@ -301,9 +301,9 @@ main{position:relative;z-index:2}
 .tbl .bad{color:var(--rose)}
 .tbl .good{color:#15803d}
 .tbl-wrap{overflow-x:auto;border:1px solid var(--stroke);border-radius:14px;background:#fff;box-shadow:var(--shadow)}
-.tbl-rate th:nth-child(1){width:46%}
-.tbl-rate th:nth-child(2),.tbl-rate th:nth-child(3){text-align:center}
-.tbl-rate td:nth-child(2),.tbl-rate td:nth-child(3){text-align:center;font-size:13.5px}
+.tbl-rate th:nth-child(1){width:40%}
+.tbl-rate th:nth-child(n+2){text-align:center}
+.tbl-rate td:nth-child(n+2){text-align:center;font-size:13.5px}
 
 /* conclusion cards */
 .pick{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
@@ -725,7 +725,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
         <div class="sec-label">LATENCY &amp; AVAILABILITY</div>
         <div class="sec-num">05 / 07</div>
         <h2 class="sec-title">生成延迟与可用性：好答案，也要按时交卷</h2>
-        <p class="sec-desc">本次评测把「模型能否按时返回结果」本身纳入观察维度：先看首轮缺失率，再看多轮补跑之后的残留缺失率。</p>
+        <p class="sec-desc">本次评测把「模型能否按时返回结果」本身纳入观察维度，分别记录首轮与两轮补跑之后的缺失率。</p>
       </div>
       <div class="rule"></div>
 
@@ -736,7 +736,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
             <span>12.3%</span>
           </div>
           <h4>kimi-k3.1-pro</h4>
-          <p>首轮 61 条 → 补跑后 37 条</p>
+          <p>首轮 20.3% → 三轮后 12.3%</p>
         </div>
         <div class="lat reveal">
           <div class="ring">
@@ -744,7 +744,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
             <span>7.3%</span>
           </div>
           <h4>kimi-k3</h4>
-          <p>首轮 31 条 → 补跑后 22 条</p>
+          <p>首轮 10.3% → 三轮后 7.3%</p>
         </div>
         <div class="lat ok reveal">
           <div class="ring">
@@ -752,7 +752,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
             <span>0%</span>
           </div>
           <h4>MiniMax-M2.5</h4>
-          <p>首轮 95 条 → 第二轮即归零</p>
+          <p>首轮 31.7% → 第二轮归零</p>
         </div>
         <div class="lat ok reveal">
           <div class="ring">
@@ -766,19 +766,19 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
 
       <div class="tbl-wrap reveal" style="margin-top:14px">
         <table class="tbl tbl-rate">
-          <thead><tr><th>模型</th><th>首轮缺失率</th><th>补跑后缺失率</th></tr></thead>
+          <thead><tr><th>模型</th><th>首轮缺失率</th><th>第二轮缺失率</th><th>第三轮缺失率</th></tr></thead>
           <tbody>
-            <tr><td class="model">kimi-k3.1-pro</td><td class="mono">20.3%</td><td class="bad mono">12.3%</td></tr>
-            <tr><td class="model">kimi-k3</td><td class="mono">10.3%</td><td class="bad mono">7.3%</td></tr>
-            <tr><td class="model">MiniMax-M2.5</td><td class="mono">31.7%</td><td class="mono good">0%</td></tr>
-            <tr><td class="model">glm-5.3 / qwen 全系 / deepseek 全系</td><td class="mono good">0%</td><td class="mono good">0%</td></tr>
+            <tr><td class="model">kimi-k3.1-pro</td><td class="mono">20.3%</td><td class="mono">13.7%</td><td class="bad mono">12.3%</td></tr>
+            <tr><td class="model">kimi-k3</td><td class="mono">10.3%</td><td class="mono">8.3%</td><td class="bad mono">7.3%</td></tr>
+            <tr><td class="model">MiniMax-M2.5</td><td class="mono">31.7%</td><td class="mono good">0%</td><td class="mono good">0%</td></tr>
+            <tr><td class="model">glm-5.3 / qwen 全系 / deepseek 全系</td><td class="mono good">0%</td><td class="mono good">0%</td><td class="mono good">0%</td></tr>
           </tbody>
         </table>
       </div>
-      <p class="note" style="margin-top:12px;color:#4b607c;font-size:12.8px;line-height:1.85">重跑策略：首轮按 300 秒超时统计；第二轮把超时放宽到 600 秒并自动重试 3 次；第三轮降至 4 并发、900 秒。按空回复条数看，kimi-k3.1-pro 由 61 条收敛到 41 条、再到 37 条，kimi-k3 由 31 条到 25 条、再到 22 条，MiniMax-M2.5 的 95 条在第二轮全部补齐。kimi 的延迟集中在长输出题目；GLM / Qwen / DeepSeek 全系零超时。</p>
+      <p class="note" style="margin-top:12px;color:#4b607c;font-size:12.8px;line-height:1.85">重跑策略：首轮固定 300 秒超时；第二轮把超时放宽到 600 秒，并对缺失题目自动重试 3 次；第三轮降至 4 并发、超时 900 秒。</p>
 
       <div class="glass card reveal" style="margin-top:16px;padding:24px">
-        <p style="margin:0;font-size:14px;color:#3a506b;line-height:1.9">本次评测最反直觉的一条结论：<strong>头部模型的精确指令遵循能力进步了，但生成延迟没有跟上。</strong>超时题目集中在要求长输出与精确字符操作的约束上 —— 恰是 IFBench 的高难度题。Kimi 系列两个跑次首轮空回复 61 / 31 条，第二轮已回收大部分（41 / 25），第三轮把并发降到 4 后仅再回收 4 与 3 条，最终残留 37 / 22 条（12.3% / 7.3%）——瓶颈在单请求生成时长，而不是并发。MiniMax 首轮 95 条，第二轮即补齐归零。若以「300 题必须全部按时交卷」的部署口径衡量，能力最强的 Kimi 反而是可用性最差的。选型场景下：要分数选 Kimi，要可用性选 GLM / MiniMax；MiniMax 是唯一的平衡点（71.3% 且补跑后完整）。</p>
+        <p style="margin:0;font-size:14px;color:#3a506b;line-height:1.9">最反直觉的结论：<strong>头部模型的指令遵循能力在进步，生成延迟却没有跟上。</strong>超时集中在要求长输出与精确字符操作的高难度题上，降低并发收效甚微——瓶颈是单请求生成时长，而不是排队。若以「300 题全部按时交卷」衡量，能力最强的 Kimi 反而是可用性最差的；要分数选 Kimi，要可用性选 GLM / MiniMax。</p>
       </div>
     </div>
   </section>
