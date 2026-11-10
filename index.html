@@ -562,7 +562,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
         <div class="rank-head"><span>#</span><span>模型</span><span>得分分布</span><span>得分</span><span>有效回复</span><span>超时率</span></div>
         <div id="rankRows"></div>
         <div class="legend" id="famLegend"></div>
-        <p class="note">注：榜单按当前所选指标实时排序。超时题目按不通过计分，含超时的跑次分数为<strong>下界</strong>；完整跑次（超时率 0%）分数无偏差。</p>
+        <p class="note">注：榜单按当前所选指标实时排序。超时题目按不通过计分，含超时的跑次分数为<strong>下界</strong>；完整跑次（超时率 0%）分数无偏差。qwen3.7-plus 复跑结果（50.3%）与主跑次（50.7%）仅差 0.4 分，榜单只保留主跑次。</p>
       </div>
 
       <div class="tier-wrap">
@@ -570,7 +570,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
           <h3 style="font-size:15px;margin:26px 0 12px;color:#0b2a45">梯队结构</h3>
           <div class="tier" style="--c:#0b93b8">
             <div class="tier-top"><b>第一梯队</b><span>66% – 73%</span></div>
-            <p>Kimi K3 系列与 MiniMax-M2.5。榜面分数咬得极近（73.0 / 72.3 / 71.3），但含义不同 —— Kimi 两个跑次因生成超时分别有 22 与 37 条空回复，空回复按不通过计，得分被系统性拉低；MiniMax 为完整跑次，分数无水分。</p>
+            <p>Kimi K3 两兄弟与 MiniMax-M2.5。榜面分数咬得极近（73.0 / 72.3 / 71.3），但含义不同 —— Kimi 两个跑次首轮分别有 61 与 31 条空回复，经 600 秒 × 3 重试、4 并发 900 秒两轮补跑后仍残留 37 与 22 条，空回复按不通过计，得分被系统性拉低；MiniMax 为完整跑次，分数无水分。</p>
             <div class="chips"><span>kimi-k3.1-pro</span><span>kimi-k3</span><span>MiniMax-M2.5</span></div>
           </div>
           <div class="tier" style="--c:#7455f5">
@@ -723,7 +723,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
         <div class="sec-label">LATENCY &amp; AVAILABILITY</div>
         <div class="sec-num">05 / 07</div>
         <h2 class="sec-title">生成延迟与可用性：好答案，也要按时交卷</h2>
-        <p class="sec-desc">本次评测把「模型能否按时返回结果」本身纳入观察维度。超时率按 900 秒超时 × 3 次重试的宽容条件统计。</p>
+        <p class="sec-desc">本次评测把「模型能否按时返回结果」本身纳入观察维度。超时治理分三轮递进：首轮 300 秒；第二轮放宽到 600 秒并自动重试 3 次；第三轮降至 4 并发、900 秒。表中记录每轮之后的空回复残留。</p>
       </div>
       <div class="rule"></div>
 
@@ -734,7 +734,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
             <span>12.3%</span>
           </div>
           <h4>kimi-k3.1-pro</h4>
-          <p>延迟最重，长输出题目会被极端拖慢</p>
+          <p>首轮 61 条 → 补跑后 37 条</p>
         </div>
         <div class="lat reveal">
           <div class="ring">
@@ -742,7 +742,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
             <span>7.3%</span>
           </div>
           <h4>kimi-k3</h4>
-          <p>同样受长输出拖累，超时率略低</p>
+          <p>首轮 31 条 → 补跑后 22 条</p>
         </div>
         <div class="lat ok reveal">
           <div class="ring">
@@ -750,7 +750,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
             <span>0%</span>
           </div>
           <h4>MiniMax-M2.5</h4>
-          <p>首轮曾 31.7% 超时，补跑后归零</p>
+          <p>首轮 95 条 → 第二轮即归零</p>
         </div>
         <div class="lat ok reveal">
           <div class="ring">
@@ -764,18 +764,18 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
 
       <div class="tbl-wrap reveal" style="margin-top:18px">
         <table class="tbl">
-          <thead><tr><th>模型</th><th>首轮超时率（300s）</th><th>宽容条件残留超时（900s × 3 重试）</th><th>评价</th></tr></thead>
+          <thead><tr><th>模型</th><th>第 1 轮 · 300s</th><th>第 2 轮 · 600s × 3 重试</th><th>第 3 轮 · 4 并发 · 900s</th><th>评价</th></tr></thead>
           <tbody>
-            <tr><td class="model">kimi-k3.1-pro</td><td class="dim">—</td><td class="bad mono">12.3%</td><td>延迟最重，长输出题目会极端拖慢</td></tr>
-            <tr><td class="model">kimi-k3</td><td class="dim">—</td><td class="bad mono">7.3%</td><td>同上</td></tr>
-            <tr><td class="model">MiniMax-M2.5</td><td class="mono">31.7%（95/300）</td><td class="mono">0%（补跑归零）</td><td>依赖重试与超时预算，可用但需耐心</td></tr>
-            <tr><td class="model">glm-5.3 / qwen 全系 / deepseek 全系</td><td class="mono good">0%</td><td class="mono good">0%</td><td>稳定性最好</td></tr>
+            <tr><td class="model">kimi-k3.1-pro</td><td class="mono">61 条（20.3%）</td><td class="mono">41 条</td><td class="bad mono">37 条（12.3%）</td><td>延迟最重，长输出题目会被极端拖慢</td></tr>
+            <tr><td class="model">kimi-k3</td><td class="mono">31 条（10.3%）</td><td class="mono">25 条</td><td class="bad mono">22 条（7.3%）</td><td>同样受长输出拖累，两轮补跑后收敛有限</td></tr>
+            <tr><td class="model">MiniMax-M2.5</td><td class="mono">95 条（31.7%）</td><td class="mono good">0 条</td><td class="mono good">0 条（完整）</td><td>依赖重试与超时预算，可用但需耐心</td></tr>
+            <tr><td class="model">glm-5.3 / qwen 全系 / deepseek 全系</td><td class="mono good">0</td><td class="mono good">0</td><td class="mono good">0</td><td>稳定性最好</td></tr>
           </tbody>
         </table>
       </div>
 
       <div class="glass card reveal" style="margin-top:16px;padding:24px">
-        <p style="margin:0;font-size:14px;color:#3a506b;line-height:1.9">本次评测最反直觉的一条结论：<strong>头部模型的精确指令遵循能力进步了，但生成延迟没有跟上。</strong>超时题目集中在要求长输出与精确字符操作的约束上 —— 恰是 IFBench 的高难度题。若以「300 题必须全部按时交卷」的部署口径衡量，能力最强的 Kimi 反而是可用性最差的。选型场景下：要分数选 Kimi，要可用性选 GLM / MiniMax；MiniMax 是唯一的平衡点（71.3% 且补跑后完整）。</p>
+        <p style="margin:0;font-size:14px;color:#3a506b;line-height:1.9">本次评测最反直觉的一条结论：<strong>头部模型的精确指令遵循能力进步了，但生成延迟没有跟上。</strong>超时题目集中在要求长输出与精确字符操作的约束上 —— 恰是 IFBench 的高难度题。Kimi 两强首轮空回复 61 / 31 条，两轮补跑后仍残留 37 / 22 条（12.3% / 7.3%）；MiniMax 首轮 95 条，第二轮即补齐归零。若以「300 题必须全部按时交卷」的部署口径衡量，能力最强的 Kimi 反而是可用性最差的。选型场景下：要分数选 Kimi，要可用性选 GLM / MiniMax；MiniMax 是唯一的平衡点（71.3% 且补跑后完整）。</p>
       </div>
     </div>
   </section>
@@ -872,7 +872,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
           <div class="finding reveal" style="margin-top:14px;border-color:#f2ddb4;background:linear-gradient(160deg,#fffaf0,#fff 80%)">
             <div class="fnum" style="color:#b45309">LIMITATIONS</div>
             <h3 style="font-size:14.5px">局限性说明</h3>
-            <p>kimi 两个跑次分别有 22 / 37 条超时空回复，其 strict / loose 分数为下界；修正估计（按已答题）存在「超时题目偏难」的选择偏差，实际水平介于榜单分数与修正估计之间。</p>
+            <p>kimi 两个跑次首轮有 61 / 31 条空回复，经 600 秒与 900 秒两轮补跑后仍残留 37 / 22 条，其 strict / loose 分数为下界；修正估计（按已答题）存在「超时题目偏难」的选择偏差，实际水平介于榜单分数与修正估计之间。</p>
           </div>
         </div>
       </div>
