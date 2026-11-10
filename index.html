@@ -244,7 +244,7 @@ main{position:relative;z-index:2}
 .hcell.max{box-shadow:inset 0 0 0 1.5px rgba(245,158,11,.75),0 8px 18px -14px rgba(245,158,11,.7)}
 .hcell.max::after{content:"";position:absolute;right:5px;top:5px;width:4px;height:4px;border-radius:50%;background:#f59e0b;box-shadow:0 0 0 2px rgba(255,255,255,.9)}
 .heat-legend{display:flex;align-items:center;gap:10px;margin-top:14px;font-family:var(--mono);font-size:10.5px;color:#93a6bd}
-.heat-legend .bar{flex:1;height:6px;border-radius:99px;background:linear-gradient(90deg,rgba(13,110,150,.12),rgba(13,110,150,.98));max-width:260px;border:1px solid rgba(19,64,120,.1)}
+.heat-legend .bar{flex:1;height:6px;border-radius:99px;background:linear-gradient(90deg,#f2fbff,#8ee6f7,#22c9e6);max-width:260px;border:1px solid rgba(19,64,120,.1)}
 
 /* ============ radar ============ */
 .radar-wrap{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:20px;align-items:center}
@@ -1027,10 +1027,13 @@ const heatEl = document.getElementById('heatmap');
     html += `<div class="rh"><span>${cat.cn}</span><em>${cat.key}</em></div>`;
     MATRIX.forEach((m,mi)=>{
       const v = m.v[i];
-      const a = 0.08 + (v/100)*0.90;
-      const R = 13*a + 255*(1-a), G = 110*a + 255*(1-a), B = 150*a + 255*(1-a);
-      const color = heatText(R,G,B);
-      html += `<div class="hcell ${v===max?'max':''}" style="background:rgba(13,110,150,${a.toFixed(3)});color:${color}" title="${m.name} · ${cat.key} ${v}%">${v.toFixed(1)}</div>`;
+      const t = Math.max(0, Math.min(1, v/100));
+      const mixc = (a,b,k)=>a.map((x,i)=>Math.round(x+(b[i]-x)*k));
+      const rgb = t < 0.5
+        ? mixc([242,251,255],[142,230,247], t*2)
+        : mixc([142,230,247],[34,201,230], (t-0.5)*2);
+      const color = heatText(rgb[0],rgb[1],rgb[2]);
+      html += `<div class="hcell ${v===max?'max':''}" style="background:rgb(${rgb[0]},${rgb[1]},${rgb[2]});color:${color}" title="${m.name} · ${cat.key} ${v}%">${v.toFixed(1)}</div>`;
     });
   });
   heatEl.innerHTML = html;
