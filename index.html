@@ -775,7 +775,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
       </div>
 
       <div class="glass card reveal" style="margin-top:16px;padding:24px">
-        <p style="margin:0;font-size:14px;color:#3a506b;line-height:1.9">本次评测最反直觉的一条结论：<strong>头部模型的精确指令遵循能力进步了，但生成延迟没有跟上。</strong>超时题目集中在要求长输出与精确字符操作的约束上 —— 恰是 IFBench 的高难度题。Kimi 两强首轮空回复 61 / 31 条，两轮补跑后仍残留 37 / 22 条（12.3% / 7.3%）；MiniMax 首轮 95 条，第二轮即补齐归零。若以「300 题必须全部按时交卷」的部署口径衡量，能力最强的 Kimi 反而是可用性最差的。选型场景下：要分数选 Kimi，要可用性选 GLM / MiniMax；MiniMax 是唯一的平衡点（71.3% 且补跑后完整）。</p>
+        <p style="margin:0;font-size:14px;color:#3a506b;line-height:1.9">本次评测最反直觉的一条结论：<strong>头部模型的精确指令遵循能力进步了，但生成延迟没有跟上。</strong>超时题目集中在要求长输出与精确字符操作的约束上 —— 恰是 IFBench 的高难度题。Kimi 两强首轮空回复 61 / 31 条，第二轮已回收大部分（41 / 25），第三轮把并发降到 4 后仅再回收 4 与 3 条，最终残留 37 / 22 条（12.3% / 7.3%）——瓶颈在单请求生成时长，而不是并发。MiniMax 首轮 95 条，第二轮即补齐归零。若以「300 题必须全部按时交卷」的部署口径衡量，能力最强的 Kimi 反而是可用性最差的。选型场景下：要分数选 Kimi，要可用性选 GLM / MiniMax；MiniMax 是唯一的平衡点（71.3% 且补跑后完整）。</p>
       </div>
     </div>
   </section>
