@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IFBench 多模型精确指令遵循评测分析报告</title>
+<meta name="description" content="基于 AllenAI IFBench（NeurIPS 2025）官方测试集，对五家厂商 18 个模型跑次的全量本地评测分析报告。">
+<meta property="og:title" content="IFBench 多模型精确指令遵循评测分析报告">
+<meta property="og:description" content="18 个模型跑次、58 项约束、7 大类别的精确指令遵循能力全景对比。">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#f5f9ff">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b93b8'/%3E%3Cpath d='M8 22V10h3v12H8zm6 0V10h10v3h-7v2h6v3h-6v4h-3z' fill='%23ffffff'/%3E%3C/svg%3E">
+<style>
+
+/* ============ base ============ */
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --bg:#f5f9ff;
+  --panel:#ffffff;
+  --stroke:rgba(19,64,120,.10);
+  --stroke-2:rgba(19,64,120,.22);
+  --text:#17273d;
+  --muted:#566a84;
+  --dim:#8496ad;
+  --cyan:#0b93b8;
+  --violet:#7455f5;
+  --lime:#2f9e44;
+  --amber:#d97706;
+  --rose:#e11d48;
+  --blue:#2b6cf6;
+  --font:"PingFang SC","HarmonyOS Sans SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;
+  --mono:"SFMono-Regular",Menlo,Consolas,"Liberation Mono",monospace;
+  --maxw:1180px;
+  --shadow:0 18px 44px -30px rgba(20,60,120,.55);
+}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  margin:0;color:var(--text);
+  font-family:var(--font);line-height:1.75;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  background:
+    radial-gradient(1200px 640px at 8% -12%, #d9f1ff 0%, transparent 58%),
+    radial-gradient(1000px 560px at 92% -14%, #e8e1ff 0%, transparent 60%),
+    radial-gradient(900px 700px at 50% 112%, #e6f6ff 0%, transparent 62%),
+    linear-gradient(180deg,#fafcff 0%,#f1f6fe 42%,#fafcff 100%);
+  background-attachment:fixed;
+}
+::selection{background:rgba(11,147,184,.18);color:#06283a}
+h1,h2,h3,h4{margin:0;font-weight:750;letter-spacing:-.01em;line-height:1.28}
+p{margin:0 0 16px}
+a{color:#0a7fa0;text-decoration:none}
+a:hover{text-decoration:underline}
+strong{color:#0d2036;font-weight:650}
+em{font-style:normal}
+.mono{font-family:var(--mono)}
+.num{font-variant-numeric:tabular-nums}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 26px}
+
+/* ============ background fx ============ */
+#stars{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.55}
+.bg-grid{
+  position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.9;
+  background-image:
+    linear-gradient(rgba(20,80,160,.055) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(20,80,160,.055) 1px,transparent 1px);
+  background-size:72px 72px;
+  -webkit-mask-image:radial-gradient(ellipse 95% 55% at 50% 0%,#000 5%,transparent 72%);
+          mask-image:radial-gradient(ellipse 95% 55% at 50% 0%,#000 5%,transparent 72%);
+}
+.bg-glow{position:fixed;z-index:0;pointer-events:none;border-radius:50%;filter:blur(100px);opacity:.75}
+.g1{width:620px;height:620px;top:-260px;left:-180px;background:radial-gradient(circle,rgba(120,214,255,.55),transparent 62%)}
+.g2{width:680px;height:680px;top:-220px;right:-240px;background:radial-gradient(circle,rgba(186,166,255,.45),transparent 62%)}
+.g3{width:760px;height:760px;bottom:-420px;left:26%;background:radial-gradient(circle,rgba(140,205,255,.35),transparent 65%)}
+body::after{
+  content:"";position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.02;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/></filter><rect width='140' height='140' filter='url(%23n)'/></svg>");
+}
+
+/* ============ nav ============ */
+.nav{position:fixed;inset:0 0 auto 0;z-index:60;backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%);
+  background:rgba(255,255,255,.82);border-bottom:1px solid rgba(19,64,120,.08);box-shadow:0 12px 32px -28px rgba(20,60,120,.6)}
+.nav-in{max-width:var(--maxw);margin:0 auto;padding:0 26px;height:62px;display:flex;align-items:center;gap:20px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11.5px;letter-spacing:.2em;color:#0a7fa0;white-space:nowrap}
+.brand .dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 0 4px rgba(11,147,184,.14);animation:pulse 2.2s ease-in-out infinite}
+.brand b{color:#0d2036;font-weight:600;letter-spacing:.12em}
+.nav-links{display:flex;gap:2px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-links a{font-size:13px;color:var(--muted);padding:7px 11px;border-radius:8px;white-space:nowrap;transition:.22s}
+.nav-links a:hover{color:#0a7fa0;background:rgba(11,147,184,.08);text-decoration:none}
+.nav-links a.active{color:#fff;background:linear-gradient(120deg,#0b93b8,#7455f5);font-weight:650;box-shadow:0 8px 18px -12px rgba(11,147,184,.9)}
+.progress{position:fixed;top:62px;left:0;height:2px;width:0;z-index:61;background:linear-gradient(90deg,#0b93b8,#7455f5)}
+
+/* ============ hero ============ */
+.hero{position:relative;z-index:2;padding:146px 0 14px;text-align:center}
+.eyebrow{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:11px;letter-spacing:.26em;
+  color:#07708c;padding:7px 16px;border-radius:999px;border:1px solid rgba(11,147,184,.28);
+  background:rgba(255,255,255,.72);box-shadow:0 8px 20px -16px rgba(11,120,160,.8)}
+.eyebrow .p{width:6px;height:6px;border-radius:50%;background:#2f9e44;box-shadow:0 0 0 4px rgba(47,158,68,.16);animation:pulse 1.8s infinite}
+.hero h1{margin:26px 0 0;font-size:clamp(34px,5.6vw,64px);line-height:1.16;letter-spacing:-.025em;font-weight:800;
+  background:linear-gradient(112deg,#0b2a45 6%,#0b7fa3 36%,#6247ee 68%,#0b2a45 99%);
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.hero h1 .line2{display:block;font-size:.62em;letter-spacing:.01em;font-weight:700;color:#24405f;
+  background:none;-webkit-text-fill-color:#24405f;margin-top:10px}
+.hero-sub{max-width:720px;margin:22px auto 0;color:var(--muted);font-size:15.5px;line-height:1.85}
+.hero-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:26px 0 0}
+.hero-tags span{font-family:var(--mono);font-size:11.5px;color:#4a607d;padding:5px 12px;border-radius:6px;
+  border:1px solid var(--stroke);background:rgba(255,255,255,.8);box-shadow:0 6px 14px -12px rgba(20,60,120,.7)}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:46px;text-align:left}
+.kpi-card{position:relative;overflow:hidden;padding:22px 20px 18px;border-radius:16px;border:1px solid var(--stroke);
+  background:linear-gradient(165deg,#ffffff,#f7fbff);box-shadow:var(--shadow);transition:transform .35s ease,border-color .35s,box-shadow .35s}
+.kpi-card::before{content:"";position:absolute;left:0;top:0;width:100%;height:3px;background:linear-gradient(90deg,var(--c),transparent 90%);opacity:.9}
+.kpi-card::after{content:"";position:absolute;right:-46px;top:-52px;width:132px;height:132px;border-radius:50%;background:radial-gradient(circle,var(--cg),transparent 68%)}
+.kpi-card:hover{transform:translateY(-4px);border-color:rgba(11,147,184,.35);box-shadow:0 26px 54px -34px rgba(11,120,160,.75)}
+.kpi-num{display:flex;align-items:baseline;gap:2px;font-family:var(--mono);font-size:clamp(26px,3.3vw,38px);font-weight:700;line-height:1;letter-spacing:-.02em;color:#0b2a45}
+.kpi-num .u{font-size:.48em;color:var(--dim);font-weight:500;margin-left:2px}
+.kpi-lbl{margin-top:11px;font-size:12.5px;line-height:1.55;color:var(--muted)}
+.kpi-lbl b{display:block;color:#25405e;font-weight:600;font-size:13px;margin-bottom:2px}
+
+/* ============ section ============ */
+main{position:relative;z-index:2}
+.section{position:relative;padding:66px 0 8px;scroll-margin-top:86px}
+.sec-head{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.sec-label{font-family:var(--mono);font-size:11.5px;letter-spacing:.3em;color:#0a7fa0;padding-bottom:6px;display:flex;align-items:center;gap:10px}
+.sec-label::before{content:"";width:26px;height:1px;background:linear-gradient(90deg,transparent,#0a7fa0)}
+.sec-num{font-family:var(--mono);font-size:13px;color:#9aabc2;letter-spacing:.1em}
+.sec-title{font-size:clamp(24px,3.1vw,34px);font-weight:750;margin-top:4px;width:100%;color:#0b2a45}
+.sec-desc{color:var(--muted);font-size:14.5px;margin:10px 0 0;max-width:780px}
+.rule{height:1px;margin:26px 0 30px;background:linear-gradient(90deg,rgba(11,147,184,.5),rgba(116,85,245,.25),rgba(19,64,120,.06) 78%)}
+
+/* ============ glass & cards ============ */
+.glass{position:relative;border:1px solid var(--stroke);border-radius:18px;
+  background:linear-gradient(170deg,#ffffff,#f8fbff);box-shadow:var(--shadow);backdrop-filter:blur(8px);transition:.3s}
+.glass:hover{border-color:var(--stroke-2);box-shadow:0 26px 56px -34px rgba(20,60,120,.6)}
+.corner::before,.corner::after{content:"";position:absolute;width:12px;height:12px;border:1px solid rgba(11,147,184,.45);pointer-events:none}
+.corner::before{left:10px;top:10px;border-right:0;border-bottom:0;border-radius:4px 0 0 0}
+.corner::after{right:10px;bottom:10px;border-left:0;border-top:0;border-radius:0 0 4px 0}
+
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.card{padding:26px 24px}
+.card .ico{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;margin-bottom:16px;
+  background:linear-gradient(150deg,#e2f7ff,#efe9ff);border:1px solid rgba(11,147,184,.2);color:#0b8aad}
+.card h3{font-size:17px;margin-bottom:10px;color:#0b2a45}
+.card p{font-size:13.8px;color:#41566f;line-height:1.8;margin:0}
+.card p+p{margin-top:9px}
+.card .tagline{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:#93a6bd;text-transform:uppercase}
+
+/* spec table */
+.spec{margin-top:18px;padding:6px 24px}
+.spec-row{display:grid;grid-template-columns:190px 1fr;gap:18px;padding:12px 2px;border-bottom:1px dashed rgba(19,64,120,.12);font-size:13.5px}
+.spec-row:last-child{border-bottom:0}
+.spec-row dt{color:#8496ad;font-family:var(--mono);font-size:12px;letter-spacing:.04em}
+.spec-row dd{margin:0;color:#2b405b}
+.spec-row dd code{font-family:var(--mono);font-size:12.5px;color:#0a6f8e;background:#e8f6fb;padding:1px 7px;border-radius:5px}
+
+/* ============ exec summary ============ */
+.concl-list{display:grid;gap:12px;margin-top:4px}
+.concl{display:grid;grid-template-columns:56px 1fr;gap:18px;padding:22px 24px;border-radius:16px;border:1px solid var(--stroke);
+  background:#fff;box-shadow:0 14px 34px -30px rgba(20,60,120,.55);transition:.3s}
+.concl:hover{border-color:rgba(11,147,184,.3);box-shadow:0 22px 44px -32px rgba(20,60,120,.55)}
+.concl .k{font-family:var(--mono);font-size:26px;font-weight:700;color:transparent;background:linear-gradient(140deg,#0b93b8,#7455f5);-webkit-background-clip:text;background-clip:text;line-height:1.2}
+.concl h3{font-size:16px;margin-bottom:6px;color:#0b2a45}
+.concl p{margin:0;font-size:13.8px;color:#41566f;line-height:1.8}
+
+/* ============ charts ============ */
+.chart-shell{padding:24px 22px 20px;border-radius:18px;border:1px solid var(--stroke);
+  background:linear-gradient(175deg,#ffffff,#f7fbff);box-shadow:var(--shadow);position:relative;overflow:hidden}
+.chart-head{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.chart-title{font-family:var(--mono);font-size:11.5px;letter-spacing:.2em;color:#8496ad;text-transform:uppercase}
+.seg{display:inline-flex;padding:4px;gap:2px;border-radius:11px;border:1px solid var(--stroke);background:#f1f6fd}
+.seg button{appearance:none;border:0;background:transparent;color:var(--muted);font-family:var(--font);font-size:12.5px;padding:6px 13px;border-radius:8px;cursor:pointer;transition:.22s;white-space:nowrap}
+.seg button:hover{color:#0b2a45;background:rgba(255,255,255,.7)}
+.seg button.on{background:linear-gradient(120deg,#0b93b8,#7455f5);color:#fff;box-shadow:0 10px 20px -12px rgba(11,147,184,.9)}
+
+.rank-head{display:grid;grid-template-columns:38px minmax(150px,258px) minmax(0,1fr) 74px 88px 74px;gap:14px;
+  padding:0 12px 9px;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:#9aabc2;text-transform:uppercase}
+.rank-head span:nth-child(4),.rank-head span:nth-child(5),.rank-head span:nth-child(6){text-align:right}
+.rank-row{display:grid;grid-template-columns:38px minmax(150px,258px) minmax(0,1fr) 74px 88px 74px;
+  grid-template-areas:"r m b v val t";gap:14px;align-items:center;
+  padding:9px 12px;border-radius:10px;border:1px solid transparent;transition:background .22s,border-color .22s}
+.rank-row:hover{background:rgba(11,147,184,.05);border-color:rgba(11,147,184,.16)}
+.rank-row.hot{background:linear-gradient(90deg,rgba(11,147,184,.07),rgba(11,147,184,.01) 60%,transparent)}
+.rank-row.is-new{border-color:rgba(47,158,68,.22)}
+.r{grid-area:r;font-family:var(--mono);font-size:12px;color:#9aabc2}
+.rank-row.hot .r{color:#0b8aad}
+.m{grid-area:m;display:flex;align-items:center;gap:9px;min-width:0}
+.m .name{font-size:13px;color:#0f2438;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:550}
+.badge{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;padding:2px 6px;border-radius:5px;
+  color:var(--c);border:1px solid rgba(19,64,120,.16);background:rgba(19,64,120,.05);flex:none}
+@supports (color:color-mix(in srgb,red 40%,transparent)){
+  .badge{border-color:color-mix(in srgb,var(--c) 30%,transparent);background:color-mix(in srgb,var(--c) 10%,transparent)}
+}
+.b{grid-area:b}
+.bar-track{height:9px;border-radius:99px;background:
+  repeating-linear-gradient(90deg,rgba(19,64,120,.09) 0 1px,transparent 1px 25%),
+  #edf3fb;
+  box-shadow:inset 0 0 0 1px rgba(19,64,120,.04);overflow:hidden;position:relative}
+.bar-fill{height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--cl),var(--c));
+  box-shadow:0 2px 8px -2px var(--c);transition:width 1.15s cubic-bezier(.22,.8,.24,1)}
+.v{grid-area:v;text-align:right;font-family:var(--mono);font-size:14px;font-weight:650;color:#0b2a45}
+.v small{font-size:10.5px;color:#93a6bd;font-weight:400;margin-left:1px}
+.val{grid-area:val;font-family:var(--mono);font-size:11px;color:#93a6bd;text-align:right;white-space:nowrap}
+.t{grid-area:t;font-family:var(--mono);font-size:11px;text-align:right;color:#93a6bd;white-space:nowrap}
+.t.warn{color:var(--rose)}
+.t.warn::before{content:"●";font-size:7px;vertical-align:1px;margin-right:4px;animation:pulse 2s infinite}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:16px;padding-top:14px;border-top:1px solid rgba(19,64,120,.08);font-size:11.5px;color:var(--muted)}
+.legend i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px;vertical-align:0;box-shadow:0 0 0 2px rgba(255,255,255,.9)}
+.note{font-size:12px;color:#8496ad;margin-top:14px;line-height:1.7}
+.note b{color:#4b607c;font-weight:500}
+
+/* tiers */
+.tier-wrap{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px;margin-top:18px}
+.tier{padding:18px 20px;border-radius:14px;border:1px solid var(--stroke);background:#fff;
+  box-shadow:0 12px 30px -28px rgba(20,60,120,.6);margin-bottom:10px;position:relative;overflow:hidden}
+.tier::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--c)}
+.tier-top{display:flex;align-items:baseline;gap:10px;margin-bottom:6px}
+.tier-top b{font-size:13.5px;color:#0b2a45}
+.tier-top span{font-family:var(--mono);font-size:11.5px;color:var(--c)}
+.tier p{margin:0;font-size:12.8px;color:#4b607c;line-height:1.75}
+.tier .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.tier .chips span{font-family:var(--mono);font-size:10.5px;padding:2px 7px;border-radius:5px;color:#33506f;background:#f1f6fd;border:1px solid rgba(19,64,120,.1)}
+
+/* correction */
+.corr{padding:24px;border-radius:16px;border:1px solid #f2ddb4;
+  background:linear-gradient(160deg,#fffaf0,#ffffff 70%);box-shadow:0 16px 36px -30px rgba(180,120,20,.6);position:relative;overflow:hidden}
+.corr::after{content:"";position:absolute;inset:auto -60px -80px auto;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(245,200,120,.28),transparent 70%)}
+.corr h3{font-size:15px;color:#b45309;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.corr .flow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:6px 0 14px}
+.corr .box{font-family:var(--mono);padding:8px 14px;border-radius:9px;border:1px solid rgba(19,64,120,.12);background:#fff;font-size:13px;color:#33506f;box-shadow:0 8px 18px -16px rgba(20,60,120,.6)}
+.corr .box b{display:block;font-size:19px;color:#0b2a45;line-height:1.4}
+.corr .arrow{color:#b45309;font-family:var(--mono);font-size:12px}
+.corr p{font-size:12.8px;color:#6b5a3d;line-height:1.8;margin:0;position:relative;z-index:1}
+
+/* ============ heatmap ============ */
+.heat-scroll{overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}
+.heat{display:grid;grid-template-columns:158px repeat(6,minmax(92px,1fr));gap:6px;min-width:760px;font-size:12.5px}
+.heat .hh{font-family:var(--mono);font-size:10.5px;color:#93a6bd;text-align:center;padding:4px 2px 8px;letter-spacing:.02em;line-height:1.4}
+.heat .hh b{display:block;color:#33506f;font-size:11.5px;font-weight:600;letter-spacing:0}
+.heat .rh{display:flex;align-items:center;gap:7px;padding:0 8px 0 10px;font-size:12.5px;color:#33506f;background:#f4f8fe;border-radius:8px}
+.heat .rh em{font-family:var(--mono);font-size:10px;color:#93a6bd}
+.hcell{position:relative;border-radius:8px;padding:13px 4px;text-align:center;font-family:var(--mono);font-size:12.5px;font-weight:650;
+  border:1px solid rgba(255,255,255,.5);transition:transform .2s,box-shadow .2s;cursor:default}
+.hcell:hover{transform:translateY(-2px) scale(1.02);box-shadow:0 10px 22px -12px rgba(20,80,140,.65);z-index:2}
+.hcell.max{box-shadow:inset 0 0 0 1.5px rgba(245,158,11,.75),0 8px 18px -14px rgba(245,158,11,.7)}
+.hcell.max::after{content:"";position:absolute;right:5px;top:5px;width:4px;height:4px;border-radius:50%;background:#f59e0b;box-shadow:0 0 0 2px rgba(255,255,255,.9)}
+.heat-legend{display:flex;align-items:center;gap:10px;margin-top:14px;font-family:var(--mono);font-size:10.5px;color:#93a6bd}
+.heat-legend .bar{flex:1;height:6px;border-radius:99px;background:linear-gradient(90deg,rgba(13,110,150,.12),rgba(13,110,150,.98));max-width:260px;border:1px solid rgba(19,64,120,.1)}
+
+/* ============ radar ============ */
+.radar-wrap{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:20px;align-items:center}
+.radar-box{position:relative;padding:8px}
+.radar-box svg{width:100%;height:auto;display:block;overflow:visible}
+.radar-side h3{font-size:14px;color:#25405e;margin-bottom:10px}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{appearance:none;cursor:pointer;font-family:var(--mono);font-size:11px;padding:5px 10px;border-radius:7px;background:#f3f7fd;
+  border:1px solid rgba(19,64,120,.12);color:var(--muted);transition:.2s;display:flex;align-items:center;gap:6px}
+.chip i{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.55}
+.chip.on{color:var(--c);border-color:rgba(19,64,120,.2);background:rgba(19,64,120,.05)}
+@supports (color:color-mix(in srgb,red 40%,transparent)){
+  .chip.on{border-color:color-mix(in srgb,var(--c) 35%,transparent);background:color-mix(in srgb,var(--c) 10%,transparent)}
+}
+.chip.on i{opacity:1}
+.chip:hover{transform:translateY(-1px);box-shadow:0 8px 18px -14px rgba(20,60,120,.7)}
+.radar-side p{font-size:12.5px;color:#7b8ea6;line-height:1.75;margin:14px 0 0}
+
+/* ============ findings ============ */
+.finding{padding:24px;border-radius:16px;border:1px solid var(--stroke);background:#fff;
+  box-shadow:0 16px 36px -32px rgba(20,60,120,.55);position:relative;overflow:hidden}
+.finding .fnum{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:#93a6bd;margin-bottom:10px}
+.finding h3{font-size:16px;margin-bottom:10px;color:#0b2a45}
+.finding p{font-size:13.2px;color:#41566f;line-height:1.85;margin:0}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.stat-mini{padding:11px 13px;border-radius:10px;background:#f7faff;border:1px solid #e2ecf8}
+.stat-mini b{display:block;font-family:var(--mono);font-size:19px;color:#0b2a45;line-height:1.3}
+.stat-mini span{font-size:11px;color:#7b8ea6;line-height:1.5;display:block}
+.stat-mini.bad b{color:var(--rose)}
+.stat-mini.good b{color:#15803d}
+.mini-bar{height:4px;border-radius:99px;background:#e6eef9;margin-top:9px;overflow:hidden}
+.mini-bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#7dd3e8,#0b93b8)}
+
+/* ============ latency ============ */
+.lat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.lat{padding:20px;border-radius:16px;border:1px solid var(--stroke);background:#fff;
+  box-shadow:0 16px 36px -32px rgba(20,60,120,.55);text-align:center}
+.lat .ring{position:relative;width:96px;height:96px;margin:0 auto 12px}
+.lat svg{transform:rotate(-90deg)}
+.lat .ring span{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--mono);font-size:17px;font-weight:650;color:#0b2a45}
+.lat h4{font-size:13px;color:#25405e;margin-bottom:3px}
+.lat p{font-size:11.5px;color:#8496ad;margin:0;line-height:1.6}
+.lat.ok h4{color:#15803d}
+
+/* table */
+.tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;margin-top:8px}
+.tbl thead th{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:#8496ad;text-align:left;font-weight:500;
+  padding:10px 14px;border-bottom:1px solid rgba(19,64,120,.14);white-space:nowrap}
+.tbl tbody td{padding:13px 14px;border-bottom:1px solid #eef3fb;color:#3a506b;vertical-align:middle}
+.tbl tbody tr:hover td{background:#f5faff}
+.tbl tbody tr:last-child td{border-bottom:0}
+.tbl .model{font-family:var(--mono);font-size:12.5px;color:#0b2a45}
+.tbl .dim{color:#8496ad}
+.tbl .bad{color:var(--rose)}
+.tbl .good{color:#15803d}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--stroke);border-radius:14px;background:#fff;box-shadow:var(--shadow)}
+
+/* conclusion cards */
+.pick{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.pick .p-card{padding:22px;border-radius:16px;border:1px solid var(--stroke);background:#fff;
+  box-shadow:0 16px 36px -32px rgba(20,60,120,.55);position:relative;overflow:hidden;transition:.3s}
+.pick .p-card:hover{transform:translateY(-4px);border-color:rgba(11,147,184,.3);box-shadow:0 26px 50px -34px rgba(11,120,160,.7)}
+.pick .p-card::before{content:"";position:absolute;left:0;top:0;width:100%;height:3px;background:linear-gradient(90deg,var(--c),transparent)}
+.pick .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--c);margin-bottom:12px}
+.pick h3{font-family:var(--mono);font-size:16px;color:#0b2a45;margin-bottom:8px;word-break:break-all}
+.pick p{font-size:12.5px;color:#4b607c;margin:0;line-height:1.75}
+.pick .why{display:inline-block;margin-top:12px;font-family:var(--mono);font-size:11px;color:#33506f;padding:3px 9px;border-radius:6px;background:#f1f6fd}
+
+/* appendix terminal */
+.term{border-radius:14px;border:1px solid #dfe9f6;background:#fbfdff;overflow:hidden;box-shadow:0 24px 50px -38px rgba(20,60,120,.7)}
+.term-bar{display:flex;align-items:center;gap:7px;padding:11px 14px;border-bottom:1px solid #e8f0fa;background:#f4f9ff}
+.term-bar i{width:9px;height:9px;border-radius:50%;background:#ff5f57;opacity:.85}
+.term-bar i:nth-child(2){background:#febc2e}
+.term-bar i:nth-child(3){background:#28c840}
+.term-bar span{margin-left:8px;font-family:var(--mono);font-size:10.5px;color:#93a6bd;letter-spacing:.08em}
+.term pre{margin:0;padding:18px 20px;font-family:var(--mono);font-size:12.2px;line-height:1.9;color:#3a506b;overflow-x:auto}
+.term pre .c{color:#94a8bf}
+.term pre .p{color:#0f8a5f}
+.term pre .a{color:#0b88aa}
+.term pre .s{color:#b45309}
+.term pre .k{color:#7455f5}
+
+/* footer */
+footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;background:linear-gradient(180deg,rgba(255,255,255,.4),rgba(240,246,254,.9))}
+.foot{max-width:var(--maxw);margin:0 auto;padding:40px 26px 54px;display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;font-size:12.5px;color:#7b8ea6}
+.foot .f-l b{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.22em;color:#0a7fa0;margin-bottom:8px}
+.foot .f-l p{margin:0;line-height:1.9}
+.foot .f-r{text-align:right;font-family:var(--mono);font-size:11px;line-height:2}
+.foot .f-r span{display:block;color:#93a6bd}
+
+/* to-top */
+.totop{position:fixed;right:22px;bottom:22px;z-index:55;width:42px;height:42px;border-radius:12px;display:grid;place-items:center;
+  border:1px solid rgba(11,147,184,.22);background:rgba(255,255,255,.92);color:#0b8aad;cursor:pointer;opacity:0;pointer-events:none;transform:translateY(8px);transition:.3s;backdrop-filter:blur(8px);box-shadow:0 14px 30px -20px rgba(20,60,120,.8)}
+.totop.show{opacity:1;pointer-events:auto;transform:none}
+.totop:hover{background:#e8f6fb}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none}
+
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.86)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+/* ============ responsive ============ */
+@media (max-width:1080px){
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .lat-grid{grid-template-columns:repeat(2,1fr)}
+  .pick{grid-template-columns:1fr}
+  .tier-wrap{grid-template-columns:1fr}
+  .radar-wrap{grid-template-columns:1fr}
+}
+@media (max-width:900px){
+  .nav-links{display:flex;gap:0;margin-left:auto;flex:1;min-width:0;
+    -webkit-mask-image:linear-gradient(90deg,#000 82%,transparent);mask-image:linear-gradient(90deg,#000 82%,transparent)}
+  .nav-links a{font-size:11.5px;padding:6px 7px}
+  .brand{font-size:10px;letter-spacing:.12em}
+  .brand b{display:none}
+  .grid-3{grid-template-columns:1fr}
+  .grid-2{grid-template-columns:1fr}
+  .concl{grid-template-columns:40px 1fr;gap:12px}
+  .sec-title{font-size:24px}
+}
+@media (max-width:760px){
+  .hero{padding-top:120px}
+  .rank-row{grid-template-columns:28px minmax(0,1fr) 66px;grid-template-areas:"r m v" "r b b";row-gap:9px;column-gap:12px;padding:11px 8px}
+  .rank-row .val,.rank-row .t{display:none}
+  .rank-head{display:none}
+  .hero-sub{font-size:14px}
+  .spec-row{grid-template-columns:1fr;gap:4px}
+  .chart-shell{padding:18px 14px}
+  .heat{grid-template-columns:104px repeat(6,minmax(78px,1fr))}
+  .foot{flex-direction:column}
+  .foot .f-r{text-align:left}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+  .reveal{opacity:1;transform:none}
+}
+
+</style>
+</head>
+<body>
+
+<canvas id="stars" aria-hidden="true"></canvas>
+<div class="bg-grid" aria-hidden="true"></div>
+<div class="bg-glow g1" aria-hidden="true"></div>
+<div class="bg-glow g2" aria-hidden="true"></div>
+<div class="bg-glow g3" aria-hidden="true"></div>
+
+<header class="nav">
+  <div class="nav-in">
+    <div class="brand"><span class="dot"></span>IFBENCH<b>//2025</b></div>
+    <nav class="nav-links" aria-label="章节导航">
+      <a href="#method" data-sec="method">评测方法</a>
+      <a href="#ranking" data-sec="ranking">总体排行</a>
+      <a href="#profile" data-sec="profile">类别画像</a>
+      <a href="#constraints" data-sec="constraints">关键发现</a>
+      <a href="#latency" data-sec="latency">延迟可用性</a>
+      <a href="#conclusion" data-sec="conclusion">结论建议</a>
+      <a href="#appendix" data-sec="appendix">附录</a>
+    </nav>
+  </div>
+  <div class="progress" id="progress"></div>
+</header>
+
+<main>
+
+  <!-- ================= HERO ================= -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="eyebrow"><span class="p"></span>NEURIPS 2025 · 全量本地评测</div>
+      <h1>
+        IFBench 精确指令遵循
+        <span class="line2">多模型能力评测分析报告</span>
+      </h1>
+      <p class="hero-sub">
+        基于 AllenAI IFBench 官方测试集，对 Kimi、GLM、MiniMax、Qwen、DeepSeek 五大系列 18 个模型跑次进行同口径评测，
+        量化「听起来很聪明」与「每一步都照做」之间真实的差距。
+      </p>
+      <div class="hero-tags">
+        <span>300 PROMPTS</span><span>TEMPERATURE = 0</span><span>PROMPT-LEVEL LOOSE</span><span>SEED = 42</span><span>2026.11.09</span>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card" style="--c:#0b93b8;--cg:rgba(11,147,184,.16)">
+          <div class="kpi-num"><span data-count="83.3" data-dec="1">0.0</span><span class="u">%</span></div>
+          <div class="kpi-lbl"><b>榜首修正得分</b>kimi-k3.1-pro · 按已答题正确率</div>
+        </div>
+        <div class="kpi-card" style="--c:#7455f5;--cg:rgba(116,85,245,.14)">
+          <div class="kpi-num"><span data-count="73.0" data-dec="1">0.0</span><span class="u">%</span></div>
+          <div class="kpi-lbl"><b>榜首榜面得分</b>超时按失败计，为真实下界</div>
+        </div>
+        <div class="kpi-card" style="--c:#2f9e44;--cg:rgba(47,158,68,.14)">
+          <div class="kpi-num"><span data-count="18" data-dec="0">0</span><span class="u">跑次</span></div>
+          <div class="kpi-lbl"><b>参评模型跑次</b>覆盖 5 大模型系列厂商</div>
+        </div>
+        <div class="kpi-card" style="--c:#e11d48;--cg:rgba(225,29,72,.12)">
+          <div class="kpi-num"><span data-count="12.3" data-dec="1">0.0</span><span class="u">%</span></div>
+          <div class="kpi-lbl"><b>榜首超时率</b>900 秒 × 3 次重试下仍无回复</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= EXEC SUMMARY ================= -->
+  <section class="section" id="summary">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="sec-label">EXECUTIVE SUMMARY</div>
+        <div class="sec-num">00 / 07</div>
+        <h2 class="sec-title">执行摘要：三句话读懂这次评测</h2>
+      </div>
+      <div class="rule"></div>
+
+      <div class="concl-list">
+        <div class="concl reveal">
+          <div class="k">01</div>
+          <div>
+            <h3>Kimi K3 系列在精确指令遵循上断档领先</h3>
+            <p>按已答题正确率修正后，kimi-k3.1-pro 达 <strong>83.3%</strong>、kimi-k3 达 <strong>78.0%</strong>；MiniMax-M2.5（71.3%）与 GLM-5.3（66.7%）构成第二集团；DeepSeek 全系与 Qwen 3.8 系列塌陷在 40%~48%。</p>
+          </div>
+        </div>
+        <div class="concl reveal">
+          <div class="k">02</div>
+          <div>
+            <h3>头部模型的能力与生成延迟严重脱节</h3>
+            <p>Kimi 两强在 900 秒超时 × 3 次重试的宽容条件下仍有 <strong>7%~12%</strong> 的题目拿不到回复，而能力较弱的 GLM、Qwen、DeepSeek 全系零超时 —— 能力榜与稳定榜必须分开看。</p>
+          </div>
+        </div>
+        <div class="concl reveal">
+          <div class="k">03</div>
+          <div>
+            <h3>所有模型存在共性盲区</h3>
+            <p>repeat 类（原样复述并做指定修改）与 ratio:overlap（比例重叠）类约束是集体弱点，其中「欧洲首都排序」约束四强模型<strong>全部为 0 分</strong>。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= METHOD ================= -->
+  <section class="section" id="method">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="sec-label">METHODOLOGY</div>
+        <div class="sec-num">01 / 07</div>
+        <h2 class="sec-title">评测背景与方法</h2>
+        <p class="sec-desc">本章说明评测对象、指标口径与工程处理方式，为后续排行与类别分析提供可复现的方法学基础。</p>
+      </div>
+      <div class="rule"></div>
+
+      <div class="grid-3">
+        <div class="glass card corner reveal">
+          <div class="ico">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6h16M4 12h10M4 18h7"/><circle cx="18" cy="16" r="3"/></svg>
+          </div>
+          <div class="tagline">WHAT IS IT</div>
+          <h3>IFBench 是什么</h3>
+          <p>AllenAI 发表于 NeurIPS 2025 的精确指令遵循基准（arXiv:2507.02833）。测试集含 300 条来自 WildChat 留出集的真实用户 prompt，每条附带 1~3 个可机器验证的新颖约束，共 58 种约束、83 个验证器。</p>
+          <p>与 IFEval 不同，这些约束对模型是<strong>分布外（OOD）</strong>的，覆盖 count / format / words / sentence / ratio / repeat / custom 七大类。</p>
+        </div>
+        <div class="glass card corner reveal">
+          <div class="ico">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 17l5-6 4 3 5-8 4 5"/><path d="M3 21h18"/></svg>
+          </div>
+          <div class="tagline">METRICS</div>
+          <h3>三层指标口径</h3>
+          <p>主口径为 <strong>prompt-level loose accuracy</strong>：对回复做去 Markdown 标记等变换后，任一变体通过即算通过，是论文与公开榜单的通用指标。</p>
+          <p>同时报告 strict（严格匹配）与 instruction-level（约束级）口径作对照，避免单一指标误读。</p>
+        </div>
+        <div class="glass card corner reveal">
+          <div class="ico">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><circle cx="12" cy="12" r="4"/></svg>
+          </div>
+          <div class="tagline">ENGINEERING</div>
+          <h3>两类工程修复</h3>
+          <p>一是中文 Windows 环境的编码补丁（文件读写显式 UTF-8）；二是网络鲁棒性增强（单请求超时 300→600/900 秒、失败自动重试 3 次、断点续跑识别并重试空回复）。</p>
+          <p>评分完全复用官方验证器，<strong>不影响评分逻辑</strong>，横向可比。</p>
+        </div>
+      </div>
+
+      <div class="glass spec reveal" style="margin-top:16px">
+        <div class="spec-row"><dt>测试集</dt><dd>IFBench_test.jsonl · <code>300 prompts</code></dd></div>
+        <div class="spec-row"><dt>采样温度</dt><dd><code>temperature = 0</code>（所有跑次统一）</dd></div>
+        <div class="spec-row"><dt>MAX_TOKENS</dt><dd><code>8192</code>（所有跑次统一）</dd></div>
+        <div class="spec-row"><dt>随机种子</dt><dd><code>seed = 42</code></dd></div>
+        <div class="spec-row"><dt>并发</dt><dd><code>8 workers</code>（补跑阶段降至 4）</dd></div>
+        <div class="spec-row"><dt>接入方式</dt><dd>OpenAI 兼容端点（阿里云百炼 compatible-mode 为主）</dd></div>
+        <div class="spec-row"><dt>评分</dt><dd>官方 evaluation_lib 本地验证，不消耗 API</dd></div>
+      </div>
+      <p class="note">所有模型使用同一套脚本（generate_responses.py → run_eval.py）以保证口径一致。</p>
+    </div>
+  </section>
+
+  <!-- ================= RANKING ================= -->
+  <section class="section" id="ranking">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="sec-label">LEADERBOARD</div>
+        <div class="sec-num">02 / 07</div>
+        <h2 class="sec-title">总体排行：18 个跑次的完整榜单</h2>
+        <p class="sec-desc">全部跑次均在同一套脚本与采样配置下产生。切换指标可对比 loose / strict / instruction-level 三种口径的排序差异。</p>
+      </div>
+      <div class="rule"></div>
+
+      <div class="chart-shell reveal">
+        <div class="chart-head">
+          <div class="chart-title">SCORE / 0 – 100</div>
+          <div class="seg" role="tablist" aria-label="切换指标">
+            <button class="on" data-metric="loose" role="tab" aria-selected="true">prompt-level loose</button>
+            <button data-metric="strict" role="tab" aria-selected="false">strict</button>
+            <button data-metric="instr" role="tab" aria-selected="false">instruction-level</button>
+          </div>
+        </div>
+        <div class="rank-head"><span>#</span><span>模型</span><span>得分分布</span><span>得分</span><span>有效回复</span><span>超时率</span></div>
+        <div id="rankRows"></div>
+        <div class="legend" id="famLegend"></div>
+        <p class="note">注：榜单按当前所选指标实时排序。超时题目按不通过计分，含超时的跑次分数为<strong>下界</strong>；完整跑次（超时率 0%）分数无偏差。qwen3.7-plus 复跑结果（50.3%）与主跑次（50.7%）仅差 0.4 分，榜单只保留主跑次。</p>
+      </div>
+
+      <div class="tier-wrap">
+        <div class="reveal">
+          <h3 style="font-size:15px;margin:26px 0 12px;color:#0b2a45">梯队结构</h3>
+          <div class="tier" style="--c:#0b93b8">
+            <div class="tier-top"><b>第一梯队</b><span>66% – 73%</span></div>
+            <p>Kimi K3 两兄弟与 MiniMax-M2.5。榜面分数咬得极近（73.0 / 72.3 / 71.3），但含义不同 —— Kimi 两个跑次因生成超时分别有 22 与 37 条空回复，空回复按不通过计，得分被系统性拉低；MiniMax 为完整跑次，分数无水分。</p>
+            <div class="chips"><span>kimi-k3.1-pro</span><span>kimi-k3</span><span>MiniMax-M2.5</span></div>
+          </div>
+          <div class="tier" style="--c:#7455f5">
+            <div class="tier-top"><b>第二梯队</b><span>50% – 54%</span></div>
+            <p>Qwen 3.7 系列（max / plus）。该系列在 count 与 words 上的表现明显好于后继的 3.8 系列，形成代际倒挂。</p>
+            <div class="chips"><span>qwen3.7-max</span><span>qwen3.7-plus</span></div>
+          </div>
+          <div class="tier" style="--c:#d97706">
+            <div class="tier-top"><b>第三梯队</b><span>40% – 48%</span></div>
+            <p>Qwen 3.8 全系、qwen3.7-flash 与 DeepSeek 全系共 13 个跑次。repeat 类 0~22%、words 类 17%~30%，与四强的差距是代际性的，不是波动。</p>
+            <div class="chips"><span>Qwen 3.8 ×5</span><span>DeepSeek ×7</span><span>qwen3.7-flash</span></div>
+          </div>
+        </div>
+
+        <div class="corr reveal">
+          <h3>Kimi K3 系列真实实力的修正估计</h3>
+          <div class="flow">
+            <div class="box">榜面得分<b>73.0%</b></div>
+            <div class="arrow">── 剔除超时 ──▶</div>
+            <div class="box">修正得分<b style="color:#15803d">83.3%</b></div>
+          </div>
+          <p>仅按已成功回复且可评分的题目计算正确率：kimi-k3.1-pro 为 83.3%（216/259），kimi-k3 为 78.0%（217/278）。即使保守估计（超时题目多为要求长输出的高难度题，补齐后得分会打折），K3 系列补齐后的真实水平大概率落在 <strong>75%~80%</strong> 区间，kimi-k3.1-pro 很可能实际登顶。</p>
+          <p style="margin-top:10px">据此建议采用<strong>双口径呈现</strong>：严格口径下三强同档；能力口径下 Kimi 断档领先。两种口径的差值，本身就是「生成延迟成本」的量化。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PROFILE ================= -->
+  <section class="section" id="profile">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="sec-label">CAPABILITY MATRIX</div>
+        <div class="sec-num">03 / 07</div>
+        <h2 class="sec-title">类别能力画像：谁擅长什么</h2>
+        <p class="sec-desc">以 6 个代表模型（四强 + qwen3.7-max + deepseek-v4-pro）在 7 大类上的 loose 得分构建能力矩阵，颜色越亮代表该类别越强。</p>
+      </div>
+      <div class="rule"></div>
+
+      <div class="chart-shell reveal">
+        <div class="chart-head">
+          <div class="chart-title">LOOSE ACCURACY BY CATEGORY</div>
+          <div class="chart-title" style="color:#b45309">▮ 琥珀点 = 该类别最高分</div>
+        </div>
+        <div class="heat-scroll"><div class="heat" id="heatmap"></div></div>
+        <div class="heat-legend"><span>0%</span><div class="bar"></div><span>100%</span></div>
+      </div>
+
+      <div class="glass chart-shell reveal" style="margin-top:16px">
+        <div class="chart-head"><div class="chart-title">RADAR / SHAPE OF CAPABILITY</div></div>
+        <div class="radar-wrap">
+          <div class="radar-box"><svg id="radar" viewBox="0 0 560 470" role="img" aria-label="六模型七类别能力雷达图"></svg></div>
+          <div class="radar-side">
+            <h3>选择模型叠加对比</h3>
+            <div class="chips" id="radarChips"></div>
+            <p>雷达图形状越接近正多边形，说明能力越均衡；出现明显凹陷的轴，就是该模型的家族性短板。MiniMax-M2.5 是四强中唯一没有明显缺角的均衡型选手。</p>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="font-size:15px;margin:30px 0 14px;color:#0b2a45" class="reveal">各模型的单项能力优势</h3>
+      <div class="grid-2">
+        <div class="finding reveal">
+          <div class="fnum">01 / KIMI-K3</div>
+          <h3>计数：全场唯一破 90%</h3>
+          <p>count 类 92.3%，是全场唯一在严格计数任务上超过 90% 的模型；ratio 类 68.2% 亦为第一。达到 90% 以上正确率的约束有 28/58 条，为全场最多。</p>
+        </div>
+        <div class="finding reveal">
+          <div class="fnum">02 / KIMI-K3.1-PRO</div>
+          <h3>复述改写：88.9% 居首</h3>
+          <p>repeat 类 88.9%，其中 repeat_span 与 repeat_change 两个约束均为 100%；custom 类 81.8% 亦为第一，组合约束的处理能力独树一帜。</p>
+        </div>
+        <div class="finding reveal">
+          <div class="fnum">03 / MINIMAX-M2.5</div>
+          <h3>格式约束：90.8% 居首</h3>
+          <p>format 类 90.8%，且是四强中唯一没有明显短板的均衡型选手（最低类别 ratio 也有 47.7%），在「分数 + 可用性」上是最稳的平衡点。</p>
+        </div>
+        <div class="finding reveal">
+          <div class="fnum">04 / GLM-5.3</div>
+          <h3>词级与句法：形成明显优势</h3>
+          <p>words 类 70.8%（第二名 59.6%）、sentence 类 75.0%，两项均为 Qwen / DeepSeek 系（17%~30%）的 2~4 倍，也是零超时的稳定选手。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CONSTRAINTS ================= -->
+  <section class="section" id="constraints">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="sec-label">CONSTRAINT-LEVEL INSIGHTS</div>
+        <div class="sec-num">04 / 07</div>
+        <h2 class="sec-title">约束级关键发现</h2>
+        <p class="sec-desc">类别之下，58 项具体约束的得分差异揭示了更细粒度的模型行为特征。以下四条是最有价值的发现。</p>
+      </div>
+      <div class="rule"></div>
+
+      <div class="grid-2">
+        <div class="finding reveal">
+          <div class="fnum">FINDING 01</div>
+          <h3>repeat 类内部分化，暴露训练风格差异</h3>
+          <p>repeat_change（复述原文并只做指定修改）四强全部 100%，说明该能力已被头部模型普遍掌握；但 repeat_simple（一字不改地复述）严重分化 —— glm-5.3 拿到 100%，kimi-k3 为 0%。</p>
+          <div class="duo">
+            <div class="stat-mini good"><b>100%</b><span>repeat_change · 四强全通过</span><div class="mini-bar"><i style="width:100%"></i></div></div>
+            <div class="stat-mini bad"><b>0%</b><span>repeat_simple · kimi-k3</span><div class="mini-bar"><i style="width:2%"></i></div></div>
+          </div>
+          <p style="margin-top:12px;font-size:12.5px;color:var(--dim)">一字不改的机械复述反而更难，提示模型在「忠实性 vs 智能改写」的倾向上存在训练风格差异。</p>
+        </div>
+
+        <div class="finding reveal">
+          <div class="fnum">FINDING 02</div>
+          <h3>两个全场死穴</h3>
+          <p>「欧洲首都排序」（european_capitals_sort）四强全部 0 分；「比例重叠」（ratio:overlap）四强均仅 8%。这两类约束可作为「当前大模型共性缺口」的直接证据。</p>
+          <div class="duo">
+            <div class="stat-mini bad"><b>0%</b><span>european_capitals_sort · 四强</span><div class="mini-bar"><i style="width:2%"></i></div></div>
+            <div class="stat-mini bad"><b>8%</b><span>ratio:overlap · 四强均值</span><div class="mini-bar"><i style="width:8%"></i></div></div>
+          </div>
+          <p style="margin-top:12px;font-size:12.5px;color:var(--dim)">建议将这两条约束直接纳入后续模型迭代的回归测试集。</p>
+        </div>
+
+        <div class="finding reveal">
+          <div class="fnum">FINDING 03</div>
+          <h3>Qwen 存在代际倒挂</h3>
+          <p>qwen3.7-max / plus（51.7 / 50.7）整体强于 qwen3.8 全系（40%~48.3）。3.8 系列在 count 与 words 上明显退化 —— qwen3.8-max 的 count:numbers 仅 12.5%，而 qwen3.7-max 为 62.5%。</p>
+          <div class="duo">
+            <div class="stat-mini"><b>51.7%</b><span>qwen3.7-max overall</span></div>
+            <div class="stat-mini"><b>45.3%</b><span>qwen3.8-max overall</span></div>
+          </div>
+          <p style="margin-top:12px;font-size:12.5px;color:var(--dim)">另有证据显示动态别名存在版本漂移：固定 checkpoint 的 qwen3.8-max-0902（48.3%）高于动态别名 qwen3.8-max（45.3%）。</p>
+        </div>
+
+        <div class="finding reveal">
+          <div class="fnum">FINDING 04</div>
+          <h3>DeepSeek 别名映射得到交叉验证</h3>
+          <p>deepseek-chat（45.3%）与明确版本名 deepseek-v4.1-flash-1017（45.0%）分数几乎一致，确认旧别名底层指向 V4.1-Flash 系列。</p>
+          <div class="duo">
+            <div class="stat-mini"><b>45.3%</b><span>deepseek-chat</span></div>
+            <div class="stat-mini"><b>45.0%</b><span>v4.1-flash-1017</span></div>
+          </div>
+          <p style="margin-top:12px;font-size:12.5px;color:var(--dim)">旗舰 deepseek-v4-pro（46.7%）相对 Flash 仅有约 1.7 分优势，性价比存疑。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= LATENCY ================= -->
+  <section class="section" id="latency">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="sec-label">LATENCY &amp; AVAILABILITY</div>
+        <div class="sec-num">05 / 07</div>
+        <h2 class="sec-title">生成延迟与可用性：好答案，也要按时交卷</h2>
+        <p class="sec-desc">本次评测把「模型能否按时返回结果」本身纳入观察维度。超时率按 900 秒超时 × 3 次重试的宽容条件统计。</p>
+      </div>
+      <div class="rule"></div>
+
+      <div class="lat-grid">
+        <div class="lat reveal">
+          <div class="ring">
+            <svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="42" fill="none" stroke="#e6eef9" stroke-width="7"/><circle class="arc" cx="48" cy="48" r="42" fill="none" stroke="#e11d48" stroke-width="7" stroke-linecap="round" stroke-dasharray="264" stroke-dashoffset="264" data-pct="12.3" style="filter:drop-shadow(0 0 6px rgba(225,29,72,.35))"/></svg>
+            <span>12.3%</span>
+          </div>
+          <h4>kimi-k3.1-pro</h4>
+          <p>延迟最重，长输出题目会被极端拖慢</p>
+        </div>
+        <div class="lat reveal">
+          <div class="ring">
+            <svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="42" fill="none" stroke="#e6eef9" stroke-width="7"/><circle class="arc" cx="48" cy="48" r="42" fill="none" stroke="#ea580c" stroke-width="7" stroke-linecap="round" stroke-dasharray="264" stroke-dashoffset="264" data-pct="7.3" style="filter:drop-shadow(0 0 6px rgba(234,88,12,.35))"/></svg>
+            <span>7.3%</span>
+          </div>
+          <h4>kimi-k3</h4>
+          <p>同样受长输出拖累，超时率略低</p>
+        </div>
+        <div class="lat ok reveal">
+          <div class="ring">
+            <svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="42" fill="none" stroke="#e6eef9" stroke-width="7"/><circle class="arc" cx="48" cy="48" r="42" fill="none" stroke="#16a34a" stroke-width="7" stroke-linecap="round" stroke-dasharray="264" stroke-dashoffset="264" data-pct="0" style="filter:drop-shadow(0 0 6px rgba(22,163,74,.35))"/></svg>
+            <span>0%</span>
+          </div>
+          <h4>MiniMax-M2.5</h4>
+          <p>首轮曾 31.7% 超时，补跑后归零</p>
+        </div>
+        <div class="lat ok reveal">
+          <div class="ring">
+            <svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="42" fill="none" stroke="#e6eef9" stroke-width="7"/><circle class="arc" cx="48" cy="48" r="42" fill="none" stroke="#0b93b8" stroke-width="7" stroke-linecap="round" stroke-dasharray="264" stroke-dashoffset="264" data-pct="0" style="filter:drop-shadow(0 0 6px rgba(11,147,184,.35))"/></svg>
+            <span>0%</span>
+          </div>
+          <h4>GLM / Qwen / DeepSeek</h4>
+          <p>全系零超时，稳定性最好</p>
+        </div>
+      </div>
+
+      <div class="tbl-wrap reveal" style="margin-top:18px">
+        <table class="tbl">
+          <thead><tr><th>模型</th><th>首轮超时率（300s）</th><th>宽容条件残留超时（900s × 3 重试）</th><th>评价</th></tr></thead>
+          <tbody>
+            <tr><td class="model">kimi-k3.1-pro</td><td class="dim">—</td><td class="bad mono">12.3%</td><td>延迟最重，长输出题目会极端拖慢</td></tr>
+            <tr><td class="model">kimi-k3</td><td class="dim">—</td><td class="bad mono">7.3%</td><td>同上</td></tr>
+            <tr><td class="model">MiniMax-M2.5</td><td class="mono">31.7%（95/300）</td><td class="mono">0%（补跑归零）</td><td>依赖重试与超时预算，可用但需耐心</td></tr>
+            <tr><td class="model">glm-5.3 / qwen 全系 / deepseek 全系</td><td class="mono good">0%</td><td class="mono good">0%</td><td>稳定性最好</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="glass card reveal" style="margin-top:16px;padding:24px">
+        <p style="margin:0;font-size:14px;color:#3a506b;line-height:1.9">本次评测最反直觉的一条结论：<strong>头部模型的精确指令遵循能力进步了，但生成延迟没有跟上。</strong>超时题目集中在要求长输出与精确字符操作的约束上 —— 恰是 IFBench 的高难度题。若以「300 题必须全部按时交卷」的部署口径衡量，能力最强的 Kimi 反而是可用性最差的。选型场景下：要分数选 Kimi，要可用性选 GLM / MiniMax；MiniMax 是唯一的平衡点（71.3% 且补跑后完整）。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CONCLUSION ================= -->
+  <section class="section" id="conclusion">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="sec-label">RECOMMENDATIONS</div>
+        <div class="sec-num">06 / 07</div>
+        <h2 class="sec-title">结论与建议</h2>
+        <p class="sec-desc">从模型选型、评测方法与后续工作三个角度给出可执行建议。</p>
+      </div>
+      <div class="rule"></div>
+
+      <div class="pick">
+        <div class="p-card" style="--c:#0b93b8">
+          <div class="k">SCORE FIRST</div>
+          <h3>kimi-k3.1-pro</h3>
+          <p>追求指令遵循分数，且能接受异步 / 重试架构。修正后 83.3%，repeat 与 custom 双料第一。</p>
+          <div class="why">需要异步重试架构</div>
+        </div>
+        <div class="p-card" style="--c:#2f9e44">
+          <div class="k">BALANCED</div>
+          <h3>MiniMax-M2.5 / glm-5.3</h3>
+          <p>需要「分数 + 可用性」平衡：MiniMax 71.3% 且完整跑完；GLM 66.7% 且零超时。</p>
+          <div class="why">生产环境首选</div>
+        </div>
+        <div class="p-card" style="--c:#d97706">
+          <div class="k">LOW LATENCY</div>
+          <h3>glm-5.3</h3>
+          <p>低延迟、高稳定场景。words 类 70.8% 与 sentence 类 75.0% 均为全场第一。</p>
+          <div class="why">零超时 · 稳定交付</div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-top:16px">
+        <div class="glass card reveal">
+          <div class="tagline">METHOD</div>
+          <h3>评测方法建议</h3>
+          <p>对慢模型评测必须显式设置大超时 + 重试 + 断点续跑，并把空回复从「已完成」中排除，否则分数会系统性虚低 —— 本评测中 MiniMax 首轮带 95 条空回复时得分虚低约 <strong>17 分</strong>。</p>
+        </div>
+        <div class="glass card reveal">
+          <div class="tagline">CITATION</div>
+          <h3>论文引用</h3>
+          <p>结果对外发布时引用 Pyatkin et al., 2025 (NeurIPS)，<em>Generalizing Verifiable Instruction Following</em>，<a href="https://arxiv.org/abs/2507.02833" target="_blank" rel="noopener">arXiv:2507.02833</a>。</p>
+        </div>
+      </div>
+
+      <div class="glass card reveal" style="margin-top:16px">
+        <div class="tagline">NEXT</div>
+        <h3>后续工作</h3>
+        <p style="margin-bottom:10px">① 对 repeat_simple 分化现象做逐例分析；② 将两个全场死穴约束作为后续模型迭代的回归测试集。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= APPENDIX ================= -->
+  <section class="section" id="appendix">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="sec-label">APPENDIX</div>
+        <div class="sec-num">07 / 07</div>
+        <h2 class="sec-title">附录：评测环境与复现</h2>
+        <p class="sec-desc">记录完整评测环境、工具链与复现路径，确保全部结论可复现、可审计。</p>
+      </div>
+      <div class="rule"></div>
+
+      <div class="grid-2" style="align-items:start">
+        <div class="term reveal">
+          <div class="term-bar"><i></i><i></i><i></i><span>reproduce.sh — ifbench</span></div>
+          <pre><span class="c"># 1. 环境：Windows 11 / Python 3.13 venv</span>
+<span class="p">$</span> pip install -r requirements.txt
+
+<span class="c"># 2. 一键评测（生成 → 评测 → 记入 summary.csv）</span>
+<span class="p">$</span> python run_ifbench.py <span class="a">--model</span> <span class="s">&lt;模型名&gt;</span>
+
+<span class="c"># 3. 类别 / 约束维度统计（无参数即全量重算）</span>
+<span class="p">$</span> python category_report.py
+
+<span class="c"># 4. 产物</span>
+<span class="k">results/</span>summary.csv     <span class="c"># 总分</span>
+<span class="k">results/</span>categories.csv  <span class="c"># 类别明细</span>
+<span class="k">results/</span>constraints.csv <span class="c"># 58 项约束明细</span></pre>
+        </div>
+
+        <div>
+          <div class="glass spec reveal" style="margin-top:0;padding:6px 22px">
+            <div class="spec-row"><dt>运行环境</dt><dd>Windows 11 · Python 3.13 虚拟环境</dd></div>
+            <div class="spec-row"><dt>依赖</dt><dd>nltk / spacy / langdetect / httpx / pydantic-settings</dd></div>
+            <div class="spec-row"><dt>NLTK 数据</dt><dd>punkt、punkt_tab、stopwords、averaged_perceptron_tagger_eng（手动安装）</dd></div>
+            <div class="spec-row"><dt>工具链</dt><dd>generate_responses.py → run_eval.py → run_ifbench.py → category_report.py</dd></div>
+          </div>
+          <div class="finding reveal" style="margin-top:14px;border-color:#f2ddb4;background:linear-gradient(160deg,#fffaf0,#fff 80%)">
+            <div class="fnum" style="color:#b45309">LIMITATIONS</div>
+            <h3 style="font-size:14.5px">局限性说明</h3>
+            <p>kimi 两个跑次分别有 22 / 37 条超时空回复，其 strict / loose 分数为下界；修正估计（按已答题）存在「超时题目偏难」的选择偏差，实际水平介于榜单分数与修正估计之间。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="foot">
+    <div class="f-l">
+      <b>IFBENCH EVALUATION REPORT</b>
+      <p>数据口径：prompt-level loose accuracy · temperature = 0 · 300 条测试指令<br>报告版本 v1.0 · 2026 年 11 月 9 日 · 全部跑次本地复现</p>
+    </div>
+    <div class="f-r">
+      <span>BASED ON IFBENCH (NEURIPS 2025)</span>
+      <span>arXiv:2507.02833</span>
+      <span>18 RUNS / 5 VENDORS / 58 CONSTRAINTS</span>
+    </div>
+  </div>
+</footer>
+
+<button class="totop" id="totop" aria-label="回到顶部">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+
+<script>
+/* =========================================================
+   DATA
+   ========================================================= */
+const FAM = {
+  Kimi:     {c:'#0b93b8', cl:'rgba(11,147,184,.30)'},
+  MiniMax:  {c:'#7455f5', cl:'rgba(116,85,245,.30)'},
+  GLM:      {c:'#2f9e44', cl:'rgba(47,158,68,.30)'},
+  Qwen:     {c:'#d97706', cl:'rgba(217,119,6,.30)'},
+  DeepSeek: {c:'#2b6cf6', cl:'rgba(43,108,246,.30)'}
+};
+
+const MODELS = [
+  {r:1,  name:'kimi-k3.1-pro',        fam:'Kimi',     loose:73.0, strict:66.3, instr:73.0, valid:'263/300', timeout:12.3, hot:true},
+  {r:2,  name:'kimi-k3',              fam:'Kimi',     loose:72.3, strict:69.3, instr:73.8, valid:'278/300', timeout:7.3,  hot:true},
+  {r:3,  name:'MiniMax-M2.5',         fam:'MiniMax',  loose:71.3, strict:69.3, instr:72.7, valid:'300/300', timeout:0,    hot:true},
+  {r:4,  name:'glm-5.3',              fam:'GLM',      loose:66.7, strict:59.7, instr:68.3, valid:'300/300', timeout:0,    hot:true},
+  {r:5,  name:'qwen3.7-max',          fam:'Qwen',     loose:51.7, strict:51.0, instr:54.7, valid:'300/300', timeout:0},
+  {r:6,  name:'qwen3.7-plus',         fam:'Qwen',     loose:50.7, strict:48.0, instr:54.1, valid:'300/300', timeout:0},
+  {r:7,  name:'qwen3.8-max-0902',     fam:'Qwen',     loose:48.3, strict:46.0, instr:50.9, valid:'300/300', timeout:0},
+  {r:8,  name:'qwen3.8-flash',        fam:'Qwen',     loose:47.3, strict:43.3, instr:50.0, valid:'300/300', timeout:0},
+  {r:9,  name:'deepseek-v4-pro',     fam:'DeepSeek', loose:46.7, strict:44.3, instr:50.3, valid:'300/300', timeout:0},
+  {r:10, name:'deepseek-flash',       fam:'DeepSeek', loose:46.7, strict:43.7, instr:50.6, valid:'300/300', timeout:0},
+  {r:11, name:'deepseek-chat',        fam:'DeepSeek', loose:45.3, strict:42.7, instr:48.3, valid:'300/300', timeout:0},
+  {r:12, name:'deepseek-v4-pro-0813', fam:'DeepSeek', loose:45.3, strict:40.0, instr:49.4, valid:'300/300', timeout:0},
+  {r:13, name:'qwen3.8-max',          fam:'Qwen',     loose:45.3, strict:42.7, instr:48.8, valid:'300/300', timeout:0},
+  {r:14, name:'deepseek-v4.1-flash-1017', fam:'DeepSeek', loose:45.0, strict:42.3, instr:48.6, valid:'300/300', timeout:0},
+  {r:15, name:'deepseek-v4.1-flash',  fam:'DeepSeek', loose:43.0, strict:40.7, instr:47.1, valid:'300/300', timeout:0},
+  {r:16, name:'qwen3.8-27b',          fam:'Qwen',     loose:43.0, strict:39.3, instr:44.8, valid:'300/300', timeout:0},
+  {r:17, name:'deepseek-v4-flash-0731', fam:'DeepSeek', loose:42.0, strict:36.3, instr:45.4, valid:'300/300', timeout:0},
+  {r:18, name:'qwen3.7-flash',        fam:'Qwen',     loose:40.3, strict:37.0, instr:43.0, valid:'300/300', timeout:0}
+];
+
+const CATS = [
+  {key:'count',    cn:'计数'},
+  {key:'custom',   cn:'组合'},
+  {key:'format',   cn:'格式'},
+  {key:'ratio',    cn:'比例'},
+  {key:'repeat',   cn:'复述'},
+  {key:'sentence', cn:'句法'},
+  {key:'words',    cn:'词级'}
+];
+
+const MATRIX = [
+  {name:'kimi-k3',       fam:'Kimi',    v:[92.3,72.7,77.6,68.2,66.7,67.9,59.6]},
+  {name:'kimi-k3.1-pro', fam:'Kimi',    v:[84.6,81.8,84.7,61.4,88.9,60.7,53.9]},
+  {name:'MiniMax-M2.5',  fam:'MiniMax', v:[87.7,72.7,90.8,47.7,55.6,71.4,56.2]},
+  {name:'glm-5.3',       fam:'GLM',     v:[76.9,45.5,71.4,47.7,55.6,75.0,70.8]},
+  {name:'qwen3.7-max',   fam:'Qwen',    v:[73.8,54.5,82.7,29.5,11.1,53.6,27.0]},
+  {name:'deepseek-v4-pro', fam:'DeepSeek', v:[67.7,54.5,81.6,25.0,0.0,32.1,25.8]}
+];
+
+/* =========================================================
+   RANKING
+   ========================================================= */
+const metricLabels = {loose:'prompt-level loose', strict:'strict', instr:'instruction-level'};
+let metric = 'loose';
+const ranksEl = document.getElementById('rankRows');
+
+function renderRanks(){
+  const list = MODELS.slice().sort((a,b)=> b[metric] - a[metric]);
+  ranksEl.innerHTML = list.map((m,i)=>{
+    const f = FAM[m.fam];
+    const val = m[metric];
+    const to = m.timeout > 0;
+    return `<div class="rank-row ${i<4?'hot':''}" style="--c:${f.c};--cl:${f.cl}">
+      <div class="r">${String(i+1).padStart(2,'0')}</div>
+      <div class="m"><span class="name" title="${m.name}">${m.name}</span><span class="badge" style="--c:${f.c}">${m.fam.toUpperCase()}</span></div>
+      <div class="b"><div class="bar-track"><div class="bar-fill" data-w="${val}" style="width:0"></div></div></div>
+      <div class="v">${val.toFixed(1)}<small>%</small></div>
+      <div class="val">${m.valid}</div>
+      <div class="t ${to?'warn':''}">${to?m.timeout.toFixed(1)+'%':'0.0%'}</div>
+    </div>`;
+  }).join('');
+  if(rankVisible) requestAnimationFrame(fillBars);
+}
+
+let rankVisible = false;
+function fillBars(){
+  ranksEl.querySelectorAll('.bar-fill').forEach(el=>{ el.style.width = el.dataset.w + '%'; });
+}
+const rankIO = new IntersectionObserver((entries)=>{
+  entries.forEach(en=>{
+    if(en.isIntersecting){ rankVisible = true; fillBars(); rankIO.disconnect(); }
+  });
+},{threshold:.12});
+
+document.querySelectorAll('.seg button').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.seg button').forEach(b=>{b.classList.remove('on');b.setAttribute('aria-selected','false');});
+    btn.classList.add('on'); btn.setAttribute('aria-selected','true');
+    metric = btn.dataset.metric;
+    renderRanks();
+  });
+});
+
+document.getElementById('famLegend').innerHTML =
+  Object.entries(FAM).map(([k,v])=>`<span style="color:${v.c}"><i style="background:${v.c}"></i><span style="color:var(--muted)">${k}</span></span>`).join('') +
+  `<span style="margin-left:auto;color:var(--dim)">共 18 个跑次 · 5 大系列</span>`;
+
+/* =========================================================
+   HEATMAP
+   ========================================================= */
+
+function lin(c){c/=255;return c<=0.03928?c/12.92:Math.pow((c+0.055)/1.055,2.4);}
+function relLum(r,g,b){return 0.2126*lin(r)+0.7152*lin(g)+0.0722*lin(b);}
+function contrast(l1,l2){const a=Math.max(l1,l2),b=Math.min(l1,l2);return (a+0.05)/(b+0.05);}
+function heatText(r,g,b){
+  const bg = relLum(r,g,b);
+  const white = contrast(bg, relLum(255,255,255));
+  const dark = contrast(bg, relLum(11,42,69));
+  return white >= dark ? '#ffffff' : '#0b2a45';
+}
+const heatEl = document.getElementById('heatmap');
+(function buildHeat(){
+  let html = '<div class="hh" style="text-align:left;padding-left:10px">类别 / 模型</div>';
+  MATRIX.forEach(m=>{
+    html += `<div class="hh"><b>${m.name}</b>${m.fam.toUpperCase()}</div>`;
+  });
+  CATS.forEach((cat,i)=>{
+    const vals = MATRIX.map(m=>m.v[i]);
+    const max = Math.max(...vals);
+    html += `<div class="rh"><span>${cat.cn}</span><em>${cat.key}</em></div>`;
+    MATRIX.forEach((m,mi)=>{
+      const v = m.v[i];
+      const a = 0.08 + (v/100)*0.90;
+      const R = 13*a + 255*(1-a), G = 110*a + 255*(1-a), B = 150*a + 255*(1-a);
+      const color = heatText(R,G,B);
+      html += `<div class="hcell ${v===max?'max':''}" style="background:rgba(13,110,150,${a.toFixed(3)});color:${color}" title="${m.name} · ${cat.key} ${v}%">${v.toFixed(1)}</div>`;
+    });
+  });
+  heatEl.innerHTML = html;
+})();
+
+/* =========================================================
+   RADAR
+   ========================================================= */
+const radarSvg = document.getElementById('radar');
+const radarChips = document.getElementById('radarChips');
+const selected = new Set([0,1,3]);
+const CX = 280, CY = 225, R = 152;
+
+function pt(i,n,r){
+  const ang = -Math.PI/2 + i*2*Math.PI/n;
+  return [CX + r*Math.cos(ang), CY + r*Math.sin(ang)];
+}
+
+function drawRadar(){
+  const n = CATS.length;
+  let s = '<defs><filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>';
+
+  // rings
+  [0.2,0.4,0.6,0.8,1].forEach(k=>{
+    const pts = CATS.map((_,i)=>pt(i,n,R*k).join(',')).join(' ');
+    s += `<polygon points="${pts}" fill="none" stroke="rgba(19,64,120,${k===1?0.24:0.10})" stroke-width="1"/>`;
+  });
+  // axes + labels
+  CATS.forEach((cat,i)=>{
+    const [x,y] = pt(i,n,R);
+    s += `<line x1="${CX}" y1="${CY}" x2="${x}" y2="${y}" stroke="rgba(19,64,120,.14)" stroke-width="1"/>`;
+    const [lx,ly] = pt(i,n,R+30);
+    const anchor = Math.abs(lx-CX) < 12 ? 'middle' : (lx > CX ? 'start' : 'end');
+    s += `<text x="${lx}" y="${ly+4}" text-anchor="${anchor}" fill="#44546b" font-size="12.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">${cat.cn}</text>`;
+    s += `<text x="${lx}" y="${ly+20}" text-anchor="${anchor}" fill="#93a6bd" font-size="9.5" font-family="var(--mono)" letter-spacing=".06em">${cat.key}</text>`;
+  });
+
+  // polygons
+  MATRIX.forEach((m,idx)=>{
+    if(!selected.has(idx)) return;
+    const c = FAM[m.fam].c;
+    const pts = m.v.map((v,i)=>pt(i,n,R*(v/100)).join(',')).join(' ');
+    s += `<polygon points="${pts}" fill="${c}" fill-opacity=".10" stroke="${c}" stroke-width="2" stroke-linejoin="round" filter="url(#glow)" style="transition:opacity .3s"/>`;
+    m.v.forEach((v,i)=>{
+      const [x,y] = pt(i,n,R*(v/100));
+      s += `<circle cx="${x}" cy="${y}" r="3.2" fill="#ffffff" stroke="${c}" stroke-width="2"/>`;
+    });
+  });
+
+  radarSvg.innerHTML = s;
+
+  // legend chips
+  radarChips.innerHTML = MATRIX.map((m,i)=>`
+    <button class="chip ${selected.has(i)?'on':''}" data-i="${i}" style="--c:${FAM[m.fam].c}" aria-pressed="${selected.has(i)}">
+      <i></i>${m.name}
+    </button>`).join('');
+  radarChips.querySelectorAll('.chip').forEach(ch=>{
+    ch.addEventListener('click',()=>{
+      const i = +ch.dataset.i;
+      if(selected.has(i)){ if(selected.size>1) selected.delete(i); }
+      else { if(selected.size>=6) selected.delete([...selected][0]); selected.add(i); }
+      drawRadar();
+    });
+  });
+}
+drawRadar();
+
+/* =========================================================
+   COUNT UP
+   ========================================================= */
+function countUp(el){
+  const target = parseFloat(el.dataset.count);
+  const dec = +el.dataset.dec || 0;
+  const dur = 1400; const t0 = performance.now();
+  function tick(t){
+    const p = Math.min(1,(t-t0)/dur);
+    const e = 1 - Math.pow(1-p,3);
+    el.textContent = (target*e).toFixed(dec);
+    if(p<1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+/* =========================================================
+   REVEAL / PROGRESS / NAV
+   ========================================================= */
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(en=>{
+    if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); }
+  });
+},{threshold:.12, rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+const cio = new IntersectionObserver((entries)=>{
+  entries.forEach(en=>{
+    if(en.isIntersecting){
+      en.target.querySelectorAll('[data-count]').forEach(countUp);
+      cio.unobserve(en.target);
+    }
+  });
+},{threshold:.4});
+document.querySelectorAll('.kpi-grid').forEach(el=>cio.observe(el));
+
+// rings
+const rio = new IntersectionObserver((entries)=>{
+  entries.forEach(en=>{
+    if(en.isIntersecting){
+      en.target.querySelectorAll('.arc').forEach(a=>{
+        const pct = parseFloat(a.dataset.pct);
+        const len = 2*Math.PI*42;
+        a.style.transition = 'stroke-dashoffset 1.4s cubic-bezier(.2,.8,.2,1)';
+        a.style.strokeDasharray = len;
+        a.style.strokeDashoffset = len - len*Math.min(pct,100)/100;
+      });
+      rio.unobserve(en.target);
+    }
+  });
+},{threshold:.3});
+document.querySelectorAll('.lat-grid').forEach(el=>rio.observe(el));
+
+// progress + active nav
+const progress = document.getElementById('progress');
+const links = [...document.querySelectorAll('.nav-links a')];
+const secs = links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
+const totop = document.getElementById('totop');
+
+let raf = false;
+function onScroll(){
+  if(raf) return; raf = true;
+  requestAnimationFrame(()=>{
+    const h = document.documentElement;
+    const p = h.scrollTop / Math.max(1,(h.scrollHeight - h.clientHeight));
+    progress.style.width = (p*100).toFixed(2) + '%';
+    totop.classList.toggle('show', h.scrollTop > 700);
+    let cur = null;
+    secs.forEach(s=>{ if(s.getBoundingClientRect().top <= 140) cur = s.id; });
+    links.forEach(a=>a.classList.toggle('active', a.dataset.sec === cur));
+    raf = false;
+  });
+}
+window.addEventListener('scroll', onScroll, {passive:true});
+onScroll();
+
+totop.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+
+/* =========================================================
+   STARFIELD
+   ========================================================= */
+(function stars(){
+  const cv = document.getElementById('stars');
+  const ctx = cv.getContext('2d');
+  let w,h,dpr,arr;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function size(){
+    dpr = Math.min(window.devicePixelRatio||1, 2);
+    w = cv.clientWidth; h = cv.clientHeight;
+    cv.width = w*dpr; cv.height = h*dpr;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    const count = Math.min(140, Math.round(w*h/16000));
+    arr = Array.from({length:count},()=>({
+      x:Math.random()*w, y:Math.random()*h,
+      r:Math.random()*1.4+0.3,
+      a:Math.random()*0.5+0.2,
+      s:Math.random()*0.12+0.02,
+      ph:Math.random()*Math.PI*2
+    }));
+  }
+  function frame(t){
+    ctx.clearRect(0,0,w,h);
+    arr.forEach(p=>{
+      if(!reduce){ p.y += p.s; if(p.y>h) p.y = -2; }
+      const tw = reduce ? p.a : p.a*(0.65+0.35*Math.sin(t/1400+p.ph));
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle = `rgba(38,110,170,${(tw*0.55).toFixed(3)})`;
+      ctx.fill();
+    });
+    if(!reduce) requestAnimationFrame(frame);
+  }
+  size(); frame(0);
+  let rt; window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{size();frame(0);},200);});
+})();
+
+/* first paint */
+renderRanks();
+rankIO.observe(ranksEl);
+</script>
+</body>
+</html>
