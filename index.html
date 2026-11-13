@@ -101,6 +101,7 @@ body::after{
   -webkit-background-clip:text;background-clip:text;color:transparent}
 .hero h1 .line2{display:block;font-size:.62em;letter-spacing:.01em;font-weight:700;color:#24405f;
   background:none;-webkit-text-fill-color:#24405f;margin-top:10px}
+.hero-note{margin:16px 0 0;font-size:12px;color:#7b8ea6;letter-spacing:.03em}
 .hero-sub{max-width:720px;margin:22px auto 0;color:var(--muted);font-size:15.5px;line-height:1.85}
 .hero-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:26px 0 0}
 .hero-tags span{font-family:var(--mono);font-size:11.5px;color:#4a607d;padding:5px 12px;border-radius:6px;
@@ -340,6 +341,14 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
 .foot .f-r span{display:block;color:#93a6bd}
 
 
+
+/* role strip */
+.role{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:18px;border:1px solid var(--stroke);border-radius:14px;overflow:hidden;background:rgba(19,64,120,.08)}
+.role-item{padding:16px 18px;background:#fff}
+.role-item b{display:block;font-size:12px;color:#0b5f9e;margin-bottom:5px;font-family:var(--mono);letter-spacing:.06em}
+.role-item span{font-size:11.5px;color:#5a6b82;line-height:1.6;display:block}
+@media (max-width:900px){.role{grid-template-columns:repeat(2,1fr)}}
+
 /* deep dive */
 .stack-row{display:grid;grid-template-columns:112px 1fr 42px;gap:10px;align-items:center;margin-top:9px}
 .sname{font-family:var(--mono);font-size:10px;color:#5a6b82;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -438,12 +447,13 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
         <span class="line2">多模型能力评测分析报告</span>
       </h1>
       <p class="hero-sub">
-        基于 AllenAI IFBench 官方测试集，对 Kimi、GLM、MiniMax、Qwen、DeepSeek 五大系列 18 个模型跑次进行同口径评测，
-        量化「听起来很聪明」与「每一步都照做」之间真实的差距。
+        基于 AllenAI IFBench 官方测试集，对 Kimi、GLM、MiniMax、Qwen、DeepSeek 五大系列 18 个跑次做统一口径评测。
+        从生成、补跑到分级复核，每个数字都能从 results/ 目录复算。
       </p>
       <div class="hero-tags">
-        <span>300 PROMPTS</span><span>TEMPERATURE = 0</span><span>PROMPT-LEVEL LOOSE</span><span>SEED = 42</span><span>2026.11.09</span>
+        <span>300 PROMPTS</span><span>TEMPERATURE = 0</span><span>PROMPT-LEVEL LOOSE</span><span>SEED = 42</span><span>2026.11</span>
       </div>
+      <p class="hero-note">个人项目 · 独立完成：评测执行、工具链改造、四级分析与可视化</p>
 
       <div class="kpi-grid">
         <div class="kpi-card" style="--c:#0b93b8;--cg:rgba(11,147,184,.16)">
@@ -472,7 +482,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
       <div class="sec-head reveal">
         <div class="sec-label">EXECUTIVE SUMMARY</div>
         <div class="sec-num">00 / 08</div>
-        <h2 class="sec-title">执行摘要：三句话读懂这次评测</h2>
+        <h2 class="sec-title">执行摘要：四条结论</h2>
       </div>
       <div class="rule"></div>
 
@@ -494,10 +504,24 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
         <div class="concl reveal">
           <div class="k">03</div>
           <div>
-            <h3>所有模型存在共性盲区</h3>
-            <p>repeat 类（原样复述并做指定修改）与 ratio:overlap（比例重叠）类约束是集体弱点，其中「欧洲首都排序」约束四强模型<strong>全部为 0 分</strong>。</p>
+            <h3>唯一的严格全零约束，是判定而非能力问题</h3>
+            <p>european_capitals_sort 是 18 个跑次唯一全部 0 分的约束，但分级复评后平均 57.9%、Kimi 两强 96.4%（27/28，仅一处命名变体）—— 零容错二值判定会误杀近满分回答。</p>
           </div>
         </div>
+        <div class="concl reveal">
+          <div class="k">04</div>
+          <div>
+            <h3>工程侧：95 条空回复全部补回</h3>
+            <p>把官方脚本改成一键式「生成 → 评测 → 三级汇总」管线，加入可调超时、自动重试与空回复断点续跑；MiniMax-M2.5 首轮缺失率 31.7%（95/300），补跑后归零，消除了约 17 个百分点的空回复污染。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="role reveal">
+        <div class="role-item"><b>评测执行</b><span>18 跑次 × 300 题，统一 temperature=0、seed=42、同一套脚本</span></div>
+        <div class="role-item"><b>工程改造</b><span>可调超时 + 自动重试 + 断点续跑 + 中文环境 UTF-8 补丁</span></div>
+        <div class="role-item"><b>四级分析</b><span>类别 → 58 条约束 → 分级复评 → 3056 条 badcase 归类</span></div>
+        <div class="role-item"><b>统计校验</b><span>Bootstrap 95% CI、153 对配对显著性、300×18 通过矩阵</span></div>
       </div>
     </div>
   </section>
@@ -916,7 +940,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
       <div class="glass card reveal" style="margin-top:16px">
         <div class="tagline">NEXT</div>
         <h3>后续工作</h3>
-        <p style="margin-bottom:10px">① 对 repeat_simple 分化现象做逐例分析；② 将两个全场死穴约束作为后续模型迭代的回归测试集。</p>
+        <p style="margin-bottom:10px">① 对 repeat_simple 分化现象做逐例分析；② 将 capitals_sort 与 ratio:overlap 作为后续模型迭代的回归测试集。</p>
       </div>
     </div>
   </section>
@@ -958,11 +982,27 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
             <div class="spec-row"><dt>工具链</dt><dd>generate_responses.py → run_eval.py → run_ifbench.py → category_report.py</dd></div>
           </div>
           <div class="finding reveal" style="margin-top:14px;border-color:#f2ddb4;background:linear-gradient(160deg,#fffaf0,#fff 80%)">
-            <div class="fnum" style="color:#b45309">LIMITATIONS</div>
-            <h3 style="font-size:14.5px">局限性说明</h3>
-            <p>kimi 两个跑次首轮有 61 / 31 条空回复，经 600 秒与 900 秒两轮补跑后仍残留 37 / 22 条，其 strict / loose 分数为下界；按已答题折算的分数存在「超时题目偏难」的选择偏差，仅作内部参考，本文不展示。</p>
+            <div class="fnum" style="color:#b45309">QUALITY CHECK</div>
+            <h3 style="font-size:14.5px">报告成稿后的数据校验</h3>
+            <p style="margin-bottom:6px">用 results/ 的 11 个文件逐项回算，修正了 5 处：</p>
+            <div class="dlist" style="font-size:11.5px">
+              <div><b>①</b>qwen3.7-plus 与 summary.csv 对齐（50.3 / 48.3 / 54.1）</div>
+              <div><b>②</b>kimi 类别分 4 处：93.8 / 71.4 / 63.6 / 57.3</div>
+              <div><b>③</b>count:numbers 改为 25% vs 75%，补 keywords 60%→0%</div>
+              <div><b>④</b>约束 ≥90% 数量 28 条 → 29 条</div>
+              <div><b>⑤</b>删除按已答题折算的修正分；「断档领先」改为「三强并列」</div>
+            </div>
           </div>
         </div>
+      </div>
+
+      <div class="glass card reveal" style="margin-top:16px">
+        <div class="tagline">BOUNDARIES</div>
+        <h3>这份评测的边界</h3>
+        <p style="margin-bottom:7px">① <strong>样本量</strong>：300 题，单模型 95% CI 约 ±5pp，头部三强的差异在统计上不可分辨；不要用它排 1/2/3 名。</p>
+        <p style="margin-bottom:7px">② <strong>判定口径</strong>：官方验证器是零容错二值判定，capitals_sort 会把 27/28 的回答判 0；分级复评作为平行指标，不替换官方结论。</p>
+        <p style="margin-bottom:7px">③ <strong>采样</strong>：temperature=0 单次生成，未覆盖随机性；kimi 两个跑次仍有 37 / 22 条空回复，其分数为下界。</p>
+        <p style="margin-bottom:0">④ <strong>未做</strong>：IFEval 对照与 prompt 敏感性实验（设计已就绪，未跑）。</p>
       </div>
     </div>
   </section>
@@ -973,7 +1013,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
   <div class="foot">
     <div class="f-l">
       <b>IFBENCH EVALUATION REPORT</b>
-      <p>数据口径：prompt-level loose accuracy · temperature = 0 · 300 条测试指令<br>报告版本 v1.0 · 2026 年 11 月 9 日 · 全部跑次本地复现</p>
+      <p>数据口径：prompt-level loose accuracy · temperature = 0 · 300 条测试指令<br>报告版本 v1.1 · 2026 年 11 月 13 日 · 全部跑次本地复现</p>
     </div>
     <div class="f-r">
       <span>BASED ON IFBENCH (NEURIPS 2025)</span>
