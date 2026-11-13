@@ -600,10 +600,10 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
             <button data-metric="instr" role="tab" aria-selected="false">instruction-level</button>
           </div>
         </div>
-        <div class="rank-head"><span>#</span><span>模型</span><span>得分分布</span><span>得分</span><span>95% CI</span><span>有效回复</span><span>超时率</span></div>
+        <div class="rank-head"><span>#</span><span>模型</span><span>得分分布</span><span>得分</span><span title="Bootstrap 95% CI（B=10000，seed=42）">95% CI</span><span>有效回复</span><span>超时率</span></div>
         <div id="rankRows"></div>
         <div class="legend" id="famLegend"></div>
-        <p class="note">注：榜单按当前所选指标实时排序。超时题目按不通过计分，含超时的跑次分数为<strong>下界</strong>；完整跑次（超时率 0%）分数无偏差。<br>95% CI 由 300 题 Bootstrap（B=10000，seed=42）重采样得到，为<strong>单模型</strong>区间；模型两两之间的配对检验见下方「榜面差距是否真实存在」。</p>
+        <p class="note">注：榜单按当前所选指标实时排序。超时题目按不通过计分，含超时的跑次分数为<strong>下界</strong>；完整跑次（超时率 0%）分数无偏差。</p>
       </div>
 
       <div class="tier-wrap">
@@ -635,7 +635,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
             <div class="arrow" style="color:#0b93b8">≈</div>
             <div class="box">MiniMax-M2.5<b>71.3%</b></div>
           </div>
-          <p>三强两两差距仅 0.7~1.7pp，配对 Bootstrap 的 95% CI 全部跨 0，差异不显著；单模型 CI 约 ±5pp。GLM-5.3（66.7%）与三强的 4.6~6.3pp 差距也基本不显著（仅 kimi-k3.1-pro 对 GLM 勉强显著）。真正可分辨的断层在 GLM 与 Qwen / DeepSeek 之间：14 个配对全部显著，差距 15.0~26.2pp。</p>
+          <p>对 300 题做 Bootstrap 重采样（B=10000，seed=42），单模型 95% CI 约 ±5pp；三强两两差距仅 0.7~1.7pp，配对检验的 95% CI 全部跨 0，差异不显著。GLM-5.3（66.7%）与三强的 4.6~6.3pp 差距也基本不显著（仅 kimi-k3.1-pro 对 GLM 勉强显著）。真正可分辨的断层在 GLM 与 Qwen / DeepSeek 之间：14 个配对全部显著，差距 15.0~26.2pp。</p>
         </div>
       </div>
     </div>
@@ -980,30 +980,12 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
             <div class="spec-row"><dt>依赖</dt><dd>nltk / spacy / langdetect / httpx / pydantic-settings</dd></div>
             <div class="spec-row"><dt>NLTK 数据</dt><dd>punkt、punkt_tab、stopwords、averaged_perceptron_tagger_eng（手动安装）</dd></div>
             <div class="spec-row"><dt>工具链</dt><dd>generate_responses.py → run_eval.py → run_ifbench.py → category_report.py</dd></div>
-          </div>
-          <div class="finding reveal" style="margin-top:14px;border-color:#f2ddb4;background:linear-gradient(160deg,#fffaf0,#fff 80%)">
-            <div class="fnum" style="color:#b45309">QUALITY CHECK</div>
-            <h3 style="font-size:14.5px">报告成稿后的数据校验</h3>
-            <p style="margin-bottom:6px">用 results/ 的 11 个文件逐项回算，修正了 5 处：</p>
-            <div class="dlist" style="font-size:11.5px">
-              <div><b>①</b>qwen3.7-plus 与 summary.csv 对齐（50.3 / 48.3 / 54.1）</div>
-              <div><b>②</b>kimi 类别分 4 处：93.8 / 71.4 / 63.6 / 57.3</div>
-              <div><b>③</b>count:numbers 改为 25% vs 75%，补 keywords 60%→0%</div>
-              <div><b>④</b>约束 ≥90% 数量 28 条 → 29 条</div>
-              <div><b>⑤</b>删除按已答题折算的修正分；「断档领先」改为「三强并列」</div>
-            </div>
+            <div class="spec-row"><dt>统计校验</dt><dd>Bootstrap 重采样（B=10000，seed=42）· 配对显著性检验</dd></div>
+            <div class="spec-row"><dt>结果文件</dt><dd>summary / categories / constraints / badcases / bootstrap 等 11 个 CSV</dd></div>
           </div>
         </div>
       </div>
 
-      <div class="glass card reveal" style="margin-top:16px">
-        <div class="tagline">BOUNDARIES</div>
-        <h3>这份评测的边界</h3>
-        <p style="margin-bottom:7px">① <strong>样本量</strong>：300 题，单模型 95% CI 约 ±5pp，头部三强的差异在统计上不可分辨；不要用它排 1/2/3 名。</p>
-        <p style="margin-bottom:7px">② <strong>判定口径</strong>：官方验证器是零容错二值判定，capitals_sort 会把 27/28 的回答判 0；分级复评作为平行指标，不替换官方结论。</p>
-        <p style="margin-bottom:7px">③ <strong>采样</strong>：temperature=0 单次生成，未覆盖随机性；kimi 两个跑次仍有 37 / 22 条空回复，其分数为下界。</p>
-        <p style="margin-bottom:0">④ <strong>未做</strong>：IFEval 对照与 prompt 敏感性实验（设计已就绪，未跑）。</p>
-      </div>
     </div>
   </section>
 
