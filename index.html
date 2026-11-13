@@ -603,7 +603,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
         <div class="rank-head"><span>#</span><span>模型</span><span>得分分布</span><span>得分</span><span>95% CI</span><span>有效回复</span><span>超时率</span></div>
         <div id="rankRows"></div>
         <div class="legend" id="famLegend"></div>
-        <p class="note">注：榜单按当前所选指标实时排序。超时题目按不通过计分，含超时的跑次分数为<strong>下界</strong>；完整跑次（超时率 0%）分数无偏差。<br>95% CI 由 300 题 Bootstrap（B=10000，seed=42）重采样得到；全榜 153 个配对中 79 个显著。</p>
+        <p class="note">注：榜单按当前所选指标实时排序。超时题目按不通过计分，含超时的跑次分数为<strong>下界</strong>；完整跑次（超时率 0%）分数无偏差。<br>95% CI 由 300 题 Bootstrap（B=10000，seed=42）重采样得到，为<strong>单模型</strong>区间；模型两两之间的配对检验见下方「榜面差距是否真实存在」。</p>
       </div>
 
       <div class="tier-wrap">
