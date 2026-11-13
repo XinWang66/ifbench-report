@@ -172,11 +172,11 @@ main{position:relative;z-index:2}
 .seg button:hover{color:#0b2a45;background:rgba(255,255,255,.7)}
 .seg button.on{background:linear-gradient(120deg,#0b93b8,#7455f5);color:#fff;box-shadow:0 10px 20px -12px rgba(11,147,184,.9)}
 
-.rank-head{display:grid;grid-template-columns:38px minmax(150px,258px) minmax(0,1fr) 74px 88px 74px;gap:14px;
+.rank-head{display:grid;grid-template-columns:38px minmax(150px,258px) minmax(0,1fr) 70px 104px 84px 70px;gap:14px;
   padding:0 12px 9px;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:#9aabc2;text-transform:uppercase}
 .rank-head span:nth-child(4),.rank-head span:nth-child(5),.rank-head span:nth-child(6){text-align:right}
-.rank-row{display:grid;grid-template-columns:38px minmax(150px,258px) minmax(0,1fr) 74px 88px 74px;
-  grid-template-areas:"r m b v val t";gap:14px;align-items:center;
+.rank-row{display:grid;grid-template-columns:38px minmax(150px,258px) minmax(0,1fr) 70px 104px 84px 70px;
+  grid-template-areas:"r m b v ci val t";gap:14px;align-items:center;
   padding:9px 12px;border-radius:10px;border:1px solid transparent;transition:background .22s,border-color .22s}
 .rank-row:hover{background:rgba(11,147,184,.05);border-color:rgba(11,147,184,.16)}
 .rank-row.hot{background:linear-gradient(90deg,rgba(11,147,184,.07),rgba(11,147,184,.01) 60%,transparent)}
@@ -199,6 +199,7 @@ main{position:relative;z-index:2}
   box-shadow:0 2px 8px -2px var(--c);transition:width 1.15s cubic-bezier(.22,.8,.24,1)}
 .v{grid-area:v;text-align:right;font-family:var(--mono);font-size:14px;font-weight:650;color:#0b2a45}
 .v small{font-size:10.5px;color:#93a6bd;font-weight:400;margin-left:1px}
+.ci{grid-area:ci;text-align:right;font-family:var(--mono);font-size:10.5px;color:#7b8ea6;white-space:nowrap}
 .val{grid-area:val;font-family:var(--mono);font-size:11px;color:#93a6bd;text-align:right;white-space:nowrap}
 .t{grid-area:t;font-family:var(--mono);font-size:11px;text-align:right;color:#93a6bd;white-space:nowrap}
 .t.warn{color:var(--rose)}
@@ -338,6 +339,18 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
 .foot .f-r{text-align:right;font-family:var(--mono);font-size:11px;line-height:2}
 .foot .f-r span{display:block;color:#93a6bd}
 
+
+/* deep dive */
+.stack-row{display:grid;grid-template-columns:112px 1fr 42px;gap:10px;align-items:center;margin-top:9px}
+.sname{font-family:var(--mono);font-size:10px;color:#5a6b82;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stack{display:flex;height:8px;border-radius:99px;overflow:hidden;background:#eef3fb}
+.stack i{display:block;height:100%}
+.sv{font-family:var(--mono);font-size:10px;text-align:right;color:#8496ad}
+.stack-legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px;font-size:10.5px;color:#7b8ea6}
+.stack-legend i{width:7px;height:7px;border-radius:2px;display:inline-block;margin-right:5px}
+.dlist{margin-top:10px;display:grid;gap:7px;font-size:12px;color:#3a506b;line-height:1.65}
+.dlist b{font-family:var(--mono);font-size:10px;color:#8496ad;font-weight:500;margin-right:6px}
+
 /* to-top */
 .totop{position:fixed;right:22px;bottom:22px;z-index:55;width:42px;height:42px;border-radius:12px;display:grid;place-items:center;
   border:1px solid rgba(11,147,184,.22);background:rgba(255,255,255,.92);color:#0b8aad;cursor:pointer;opacity:0;pointer-events:none;transform:translateY(8px);transition:.3s;backdrop-filter:blur(8px);box-shadow:0 14px 30px -20px rgba(20,60,120,.8)}
@@ -373,7 +386,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
 @media (max-width:760px){
   .hero{padding-top:120px}
   .rank-row{grid-template-columns:28px minmax(0,1fr) 66px;grid-template-areas:"r m v" "r b b";row-gap:9px;column-gap:12px;padding:11px 8px}
-  .rank-row .val,.rank-row .t{display:none}
+  .rank-row .val,.rank-row .t,.rank-row .ci{display:none}
   .rank-head{display:none}
   .hero-sub{font-size:14px}
   .spec-row{grid-template-columns:1fr;gap:4px}
@@ -406,6 +419,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
       <a href="#profile" data-sec="profile">类别画像</a>
       <a href="#constraints" data-sec="constraints">关键发现</a>
       <a href="#latency" data-sec="latency">延迟可用性</a>
+      <a href="#deepdive" data-sec="deepdive">深挖校验</a>
       <a href="#conclusion" data-sec="conclusion">结论建议</a>
       <a href="#appendix" data-sec="appendix">附录</a>
     </nav>
@@ -433,8 +447,8 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
 
       <div class="kpi-grid">
         <div class="kpi-card" style="--c:#0b93b8;--cg:rgba(11,147,184,.16)">
-          <div class="kpi-num"><span data-count="83.3" data-dec="1">83.3</span><span class="u">%</span></div>
-          <div class="kpi-lbl"><b>榜首修正得分</b>kimi-k3.1-pro · 按已答题正确率</div>
+          <div class="kpi-num"><span class="u" style="font-size:.8em;color:var(--muted)">±</span><span data-count="5.0" data-dec="1">5.0</span><span class="u">pp</span></div>
+          <div class="kpi-lbl"><b>95% 置信区间半宽</b>Bootstrap 1 万次 · 头部三强 ±5pp</div>
         </div>
         <div class="kpi-card" style="--c:#7455f5;--cg:rgba(116,85,245,.14)">
           <div class="kpi-num"><span data-count="73.0" data-dec="1">73.0</span><span class="u">%</span></div>
@@ -457,7 +471,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
     <div class="wrap">
       <div class="sec-head reveal">
         <div class="sec-label">EXECUTIVE SUMMARY</div>
-        <div class="sec-num">00 / 07</div>
+        <div class="sec-num">00 / 08</div>
         <h2 class="sec-title">执行摘要：三句话读懂这次评测</h2>
       </div>
       <div class="rule"></div>
@@ -466,8 +480,8 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
         <div class="concl reveal">
           <div class="k">01</div>
           <div>
-            <h3>Kimi K3 系列在精确指令遵循上断档领先</h3>
-            <p>按已答题正确率修正后，kimi-k3.1-pro 达 <strong>83.3%</strong>、kimi-k3 达 <strong>78.0%</strong>；MiniMax-M2.5（71.3%）与 GLM-5.3（66.7%）构成第二集团；DeepSeek 全系与 Qwen 3.8 系列塌陷在 40%~48%。</p>
+            <h3>头部三强并列，断层出现在第四名之后</h3>
+            <p>kimi-k3.1-pro <strong>73.0%</strong>、kimi-k3 72.3%、MiniMax-M2.5 71.3%，两两差距仅 0.7~1.7pp，配对 Bootstrap 全部不显著；GLM-5.3（66.7%）与三强的 4.6~6.3pp 也基本不显著。真正可分辨的断层在 GLM 与 Qwen / DeepSeek 之间：14 个配对全部显著，差距 15.0~26.2pp。</p>
           </div>
         </div>
         <div class="concl reveal">
@@ -493,7 +507,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
     <div class="wrap">
       <div class="sec-head reveal">
         <div class="sec-label">METHODOLOGY</div>
-        <div class="sec-num">01 / 07</div>
+        <div class="sec-num">01 / 08</div>
         <h2 class="sec-title">评测背景与方法</h2>
         <p class="sec-desc">本章说明评测对象、指标口径与工程处理方式，为后续排行与类别分析提供可复现的方法学基础。</p>
       </div>
@@ -506,7 +520,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
           </div>
           <div class="tagline">WHAT IS IT</div>
           <h3>IFBench 是什么</h3>
-          <p>AllenAI 发表于 NeurIPS 2025 的精确指令遵循基准（arXiv:2507.02833）。测试集含 300 条来自 WildChat 留出集的真实用户 prompt，每条附带 1~3 个可机器验证的新颖约束，共 58 种约束、83 个验证器。</p>
+          <p>AllenAI 发表于 NeurIPS 2025 的精确指令遵循基准（arXiv:2507.02833）。测试集含 300 条来自 WildChat 留出集的真实用户 prompt，每条附带 1~2 个可机器验证的新颖约束，共 58 种约束、83 个验证器。</p>
           <p>与 IFEval 不同，这些约束对模型是<strong>分布外（OOD）</strong>的，覆盖 count / format / words / sentence / ratio / repeat / custom 七大类。</p>
         </div>
         <div class="glass card corner reveal">
@@ -547,7 +561,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
     <div class="wrap">
       <div class="sec-head reveal">
         <div class="sec-label">LEADERBOARD</div>
-        <div class="sec-num">02 / 07</div>
+        <div class="sec-num">02 / 08</div>
         <h2 class="sec-title">总体排行：18 个跑次的完整榜单</h2>
         <p class="sec-desc">全部跑次均在同一套脚本与采样配置下产生。切换指标可对比 loose / strict / instruction-level 三种口径的排序差异。</p>
       </div>
@@ -562,10 +576,10 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
             <button data-metric="instr" role="tab" aria-selected="false">instruction-level</button>
           </div>
         </div>
-        <div class="rank-head"><span>#</span><span>模型</span><span>得分分布</span><span>得分</span><span>有效回复</span><span>超时率</span></div>
+        <div class="rank-head"><span>#</span><span>模型</span><span>得分分布</span><span>得分</span><span>95% CI</span><span>有效回复</span><span>超时率</span></div>
         <div id="rankRows"></div>
         <div class="legend" id="famLegend"></div>
-        <p class="note">注：榜单按当前所选指标实时排序。超时题目按不通过计分，含超时的跑次分数为<strong>下界</strong>；完整跑次（超时率 0%）分数无偏差。</p>
+        <p class="note">注：榜单按当前所选指标实时排序。超时题目按不通过计分，含超时的跑次分数为<strong>下界</strong>；完整跑次（超时率 0%）分数无偏差。<br>95% CI 由 300 题 Bootstrap（B=10000，seed=42）重采样得到；全榜 153 个配对中 79 个显著。</p>
       </div>
 
       <div class="tier-wrap">
@@ -573,29 +587,31 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
           <h3 style="font-size:15px;margin:26px 0 12px;color:#0b2a45">梯队结构</h3>
           <div class="tier" style="--c:#0b93b8">
             <div class="tier-top"><b>第一梯队</b><span>66% – 73%</span></div>
-            <p>Kimi K3 系列的两个跑次与 MiniMax-M2.5。榜面分数咬得极近（73.0 / 72.3 / 71.3），但含义不同 —— Kimi 两个跑次首轮分别有 61 与 31 条空回复，经 600 秒 × 3 重试、4 并发 900 秒两轮补跑后仍残留 37 与 22 条，空回复按不通过计，得分被系统性拉低；MiniMax 为完整跑次，分数无水分。</p>
+            <p>Kimi K3 系列的两个跑次与 MiniMax-M2.5。榜面分数咬得极近（73.0 / 72.3 / 71.3），两两差异不显著，但含义不同 —— Kimi 两个跑次首轮分别有 61 与 31 条空回复，经 600 秒 × 3 重试、4 并发 900 秒两轮补跑后仍残留 37 与 22 条，空回复按不通过计，得分被系统性拉低；MiniMax 为完整跑次，分数无水分。</p>
             <div class="chips"><span>kimi-k3.1-pro</span><span>kimi-k3</span><span>MiniMax-M2.5</span></div>
           </div>
           <div class="tier" style="--c:#7455f5">
-            <div class="tier-top"><b>第二梯队</b><span>50% – 54%</span></div>
+            <div class="tier-top"><b>第二梯队</b><span>50% – 52%</span></div>
             <p>Qwen 3.7 系列（max / plus）。该系列在 count 与 words 上的表现明显好于后继的 3.8 系列，形成代际倒挂。</p>
             <div class="chips"><span>qwen3.7-max</span><span>qwen3.7-plus</span></div>
           </div>
           <div class="tier" style="--c:#d97706">
             <div class="tier-top"><b>第三梯队</b><span>40% – 48%</span></div>
-            <p>Qwen 3.8 全系、qwen3.7-flash 与 DeepSeek 全系共 13 个跑次。repeat 类 0~22%、words 类 17%~30%，与四强的差距是代际性的，不是波动。</p>
-            <div class="chips"><span>Qwen 3.8 ×5</span><span>DeepSeek ×7</span><span>qwen3.7-flash</span></div>
+            <p>Qwen 3.8 全系、qwen3.7-flash 与 DeepSeek 全系共 12 个跑次。repeat 类 0~22%、words 类 17%~30%，与四强的差距是代际性的，不是波动。</p>
+            <div class="chips"><span>Qwen 3.8 ×4</span><span>DeepSeek ×7</span><span>qwen3.7-flash</span></div>
           </div>
         </div>
 
-        <div class="corr reveal">
-          <h3>Kimi K3 系列真实实力的修正估计</h3>
+        <div class="corr reveal" style="border-color:#cfe4f6;background:linear-gradient(160deg,#f3faff,#fff 70%)">
+          <h3 style="color:#0b5f9e">榜面差距是否真实存在？</h3>
           <div class="flow">
-            <div class="box">榜面得分<b>73.0%</b></div>
-            <div class="arrow">── 剔除超时 ──▶</div>
-            <div class="box">修正得分<b style="color:#15803d">83.3%</b></div>
+            <div class="box">kimi-k3.1-pro<b>73.0%</b></div>
+            <div class="arrow" style="color:#0b93b8">≈</div>
+            <div class="box">kimi-k3<b>72.3%</b></div>
+            <div class="arrow" style="color:#0b93b8">≈</div>
+            <div class="box">MiniMax-M2.5<b>71.3%</b></div>
           </div>
-          <p>仅按已成功回复且可评分的题目计算正确率：kimi-k3.1-pro 为 83.3%（216/259），kimi-k3 为 78.0%（217/278）。即使保守估计（超时题目多为要求长输出的高难度题，补齐后得分会打折），K3 系列补齐后的真实水平大概率落在 <strong>75%~80%</strong> 区间，kimi-k3.1-pro 很可能实际登顶。</p>
+          <p>三强两两差距仅 0.7~1.7pp，配对 Bootstrap 的 95% CI 全部跨 0，差异不显著；单模型 CI 约 ±5pp。GLM-5.3（66.7%）与三强的 4.6~6.3pp 差距也基本不显著（仅 kimi-k3.1-pro 对 GLM 勉强显著）。真正可分辨的断层在 GLM 与 Qwen / DeepSeek 之间：14 个配对全部显著，差距 15.0~26.2pp。</p>
         </div>
       </div>
     </div>
@@ -606,7 +622,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
     <div class="wrap">
       <div class="sec-head reveal">
         <div class="sec-label">CAPABILITY MATRIX</div>
-        <div class="sec-num">03 / 07</div>
+        <div class="sec-num">03 / 08</div>
         <h2 class="sec-title">类别能力画像：谁擅长什么</h2>
         <p class="sec-desc">以 6 个代表模型（四强 + qwen3.7-max + deepseek-v4-pro）在 7 大类上的 loose 得分构建能力矩阵，颜色越亮代表该类别越强。</p>
       </div>
@@ -638,7 +654,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
         <div class="finding reveal">
           <div class="fnum">01 / KIMI-K3</div>
           <h3>计数：全场唯一破 90%</h3>
-          <p>count 类 92.3%，是全场唯一在严格计数任务上超过 90% 的模型；ratio 类 68.2% 亦为第一。达到 90% 以上正确率的约束有 28/58 条，为全场最多。</p>
+          <p>count 类 93.8%，是全场唯一在严格计数任务上超过 90% 的模型；ratio 类 68.2% 亦为第一。达到 90% 以上正确率的约束有 29/58 条，为全场最多。</p>
         </div>
         <div class="finding reveal">
           <div class="fnum">02 / KIMI-K3.1-PRO</div>
@@ -664,7 +680,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
     <div class="wrap">
       <div class="sec-head reveal">
         <div class="sec-label">CONSTRAINT-LEVEL INSIGHTS</div>
-        <div class="sec-num">04 / 07</div>
+        <div class="sec-num">04 / 08</div>
         <h2 class="sec-title">约束级关键发现</h2>
         <p class="sec-desc">类别之下，58 项具体约束的得分差异揭示了更细粒度的模型行为特征。以下四条是最有价值的发现。</p>
       </div>
@@ -684,19 +700,19 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
 
         <div class="finding reveal">
           <div class="fnum">FINDING 02</div>
-          <h3>两个全场死穴</h3>
-          <p>「欧洲首都排序」（european_capitals_sort）四强全部 0 分；「比例重叠」（ratio:overlap）四强均仅 8%。这两类约束可作为「当前大模型共性缺口」的直接证据。</p>
+          <h3>唯一的严格全零约束，并非「不会排」</h3>
+          <p>european_capitals_sort 是全场唯一 18 个跑次全部 0 分的约束。但按 28 城标准序列逐条对齐后，kimi 两强答对 27/28（96.4%），只是把 Luxembourg 写成 Luxembourg City；MiniMax 75%（18 处错位）；GLM 46.4%（列表前混入引导句）。</p>
           <div class="duo">
-            <div class="stat-mini bad"><b>0%</b><span>european_capitals_sort · 四强</span><div class="mini-bar"><i style="width:2%"></i></div></div>
-            <div class="stat-mini bad"><b>8%</b><span>ratio:overlap · 四强均值</span><div class="mini-bar"><i style="width:8%"></i></div></div>
+            <div class="stat-mini bad"><b>0%</b><span>官方二值 · 18/18 全零</span><div class="mini-bar"><i style="width:2%"></i></div></div>
+            <div class="stat-mini"><b>57.9%</b><span>分级复评 · 全场平均</span><div class="mini-bar"><i style="width:58%"></i></div></div>
           </div>
-          <p style="margin-top:12px;font-size:12.5px;color:var(--dim)">建议将这两条约束直接纳入后续模型迭代的回归测试集。</p>
+          <p style="margin-top:12px;font-size:12.5px;color:var(--dim)">另一族是 ratio:overlap（trigram 重叠率 ±2%）：四强 8.3%，全场最高也只有 8.3%——需要生成时实时统计，模型没有内置计数器。</p>
         </div>
 
         <div class="finding reveal">
           <div class="fnum">FINDING 03</div>
           <h3>Qwen 存在代际倒挂</h3>
-          <p>qwen3.7-max / plus（51.7 / 50.7）整体强于 qwen3.8 全系（40%~48.3）。3.8 系列在 count 与 words 上明显退化 —— qwen3.8-max 的 count:numbers 仅 12.5%，而 qwen3.7-max 为 62.5%。</p>
+          <p>qwen3.7-max / plus（51.7 / 50.3）整体强于 qwen3.8 全系（40%~48.3）。3.8 系列在 count 与 words 上明显退化 —— qwen3.8-max 的 count:numbers 仅 25.0%，而 qwen3.7-max 为 75.0%。</p>
           <div class="duo">
             <div class="stat-mini"><b>51.7%</b><span>qwen3.7-max overall</span></div>
             <div class="stat-mini"><b>45.3%</b><span>qwen3.8-max overall</span></div>
@@ -723,7 +739,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
     <div class="wrap">
       <div class="sec-head reveal">
         <div class="sec-label">LATENCY &amp; AVAILABILITY</div>
-        <div class="sec-num">05 / 07</div>
+        <div class="sec-num">05 / 08</div>
         <h2 class="sec-title">生成延迟与可用性：好答案，也要按时交卷</h2>
         <p class="sec-desc">本次评测把「模型能否按时返回结果」本身纳入观察维度，分别记录首轮与两轮补跑之后的缺失率。</p>
       </div>
@@ -778,7 +794,76 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
       <p class="note" style="margin-top:12px;color:#4b607c;font-size:12.8px;line-height:1.85">重跑策略：首轮固定 300 秒超时；第二轮把超时放宽到 600 秒，并对缺失题目自动重试 3 次；第三轮降至 4 并发、超时 900 秒。</p>
 
       <div class="glass card reveal" style="margin-top:16px;padding:24px">
-        <p style="margin:0;font-size:14px;color:#3a506b;line-height:1.9">最反直觉的结论：<strong>头部模型的指令遵循能力在进步，生成延迟却没有跟上。</strong>超时集中在要求长输出与精确字符操作的高难度题上，降低并发收效甚微——瓶颈是单请求生成时长，而不是排队。若以「300 题全部按时交卷」衡量，能力最强的 Kimi 反而是可用性最差的；要分数选 Kimi，要可用性选 GLM / MiniMax。</p>
+        <p style="margin:0;font-size:14px;color:#3a506b;line-height:1.9">最反直觉的结论：<strong>头部模型的指令遵循能力在进步，生成延迟却没有跟上。</strong>超时集中在要求长输出与精确字符操作的高难度题上，降低并发收效甚微——瓶颈是单请求生成时长，而不是排队。若以「300 题全部按时交卷」衡量，榜面领先的 Kimi 反而是可用性最差的；要分数选 Kimi，要可用性选 GLM / MiniMax。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= DEEP DIVE ================= -->
+  <section class="section" id="deepdive">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="sec-label">DEEP DIVE</div>
+        <div class="sec-num">06 / 08</div>
+        <h2 class="sec-title">校验与深挖：把「死穴」拆开看</h2>
+        <p class="sec-desc">基于 3056 条 badcase 的自动归类、capitals_sort 的分级复评，以及 300 题 × 18 模型的通过矩阵。</p>
+      </div>
+      <div class="rule"></div>
+
+      <div class="grid-2">
+        <div class="finding reveal">
+          <div class="fnum">01 / FAILURE TAXONOMY</div>
+          <h3>3056 条失败里，88% 是真实违规</h3>
+          <p>四分类自动归类：真实违规 88.3%、格式包装 7.0%、生成失败 2.5%、疑似截断 2.2%。Kimi 两个跑次的失败中 43% / 28% 来自超时未返回，能力被系统性低估；MiniMax 与 GLM 则几乎全部是真实违规。</p>
+          <div style="margin-top:14px">
+            <div class="stack-row"><span class="sname">kimi-k3.1-pro</span><div class="stack"><i style="width:43%;background:#e11d48"></i><i style="width:18.4%;background:#f59e0b"></i><i style="width:0.9%;background:#7455f5"></i><i style="width:37.7%;background:#0b93b8"></i></div><span class="sv">114</span></div>
+            <div class="stack-row"><span class="sname">kimi-k3</span><div class="stack"><i style="width:28.3%;background:#e11d48"></i><i style="width:9.1%;background:#f59e0b"></i><i style="width:1%;background:#7455f5"></i><i style="width:61.6%;background:#0b93b8"></i></div><span class="sv">99</span></div>
+            <div class="stack-row"><span class="sname">MiniMax-M2.5</span><div class="stack"><i style="width:6%;background:#f59e0b"></i><i style="width:8%;background:#7455f5"></i><i style="width:86%;background:#0b93b8"></i></div><span class="sv">100</span></div>
+            <div class="stack-row"><span class="sname">glm-5.3</span><div class="stack"><i style="width:16.8%;background:#f59e0b"></i><i style="width:0.8%;background:#7455f5"></i><i style="width:82.4%;background:#0b93b8"></i></div><span class="sv">131</span></div>
+          </div>
+          <div class="stack-legend">
+            <span><i style="background:#e11d48"></i>生成失败</span>
+            <span><i style="background:#f59e0b"></i>格式包装</span>
+            <span><i style="background:#7455f5"></i>疑似截断</span>
+            <span><i style="background:#0b93b8"></i>真实违规</span>
+            <span style="margin-left:auto">右侧为失败约束条数</span>
+          </div>
+        </div>
+
+        <div class="finding reveal">
+          <div class="fnum">02 / GRADED REEVALUATION</div>
+          <h3>严格全零的 capitals_sort，分级后平均 57.9%</h3>
+          <p>18 个跑次官方二值判定全部 0 分；按 28 城标准序列做顺序敏感对齐后，分数立刻拉开：</p>
+          <div class="dlist">
+            <div><b>96.4%</b>kimi-k3 / kimi-k3.1-pro · 27/28，一处命名变体</div>
+            <div><b>75.0%</b>MiniMax-M2.5 · 18 处邻位错位</div>
+            <div><b>71.4%</b>deepseek-v4-pro · 多列 12 个城市</div>
+            <div><b>46.4%</b>glm-5.3 · 列表前混入引导句</div>
+            <div><b>21.4%</b>qwen3.8-flash · 仅 9 条命中</div>
+          </div>
+          <p style="margin-top:12px;font-size:12.5px;color:var(--dim)">零分主要来自「零容错执行」而非知识缺失：模型知道答案长什么样，只是错一个词就被一票否决。</p>
+        </div>
+
+        <div class="finding reveal">
+          <div class="fnum">03 / DIFFICULTY LAYERS</div>
+          <h3>17 题全场无人通过，42 题全场通过</h3>
+          <p>300 题里，42 题（14%）18 个模型全部通过；17 题（5.7%）全部失败；120 题（40%）只有不超过 5 个模型通过。难度集中在生成时实时计数与零容错序列操作。</p>
+          <div class="duo" style="grid-template-columns:repeat(3,1fr)">
+            <div class="stat-mini"><b>42</b><span>全场通过</span></div>
+            <div class="stat-mini bad"><b>17</b><span>全场失败</span></div>
+            <div class="stat-mini"><b>120</b><span>≤5 模型通过</span></div>
+          </div>
+        </div>
+
+        <div class="finding reveal">
+          <div class="fnum">04 / CONSTRAINT EXTREMES</div>
+          <h3>约束难度的两端</h3>
+          <p>58 条约束按 18 个跑次平均 loose 排序，两端的差距接近 100 个百分点：</p>
+          <div class="dlist">
+            <div><b>最难</b>european_capitals_sort 0% · ratio:overlap 5.1% · words:odd_even_syllables 11.1% · repeat:repeat_span 11.1%</div>
+            <div><b>最易</b>format:output_template 100% · count:person_names 99.1% · format:sub-bullets 99.1% · format:quote_unquote 93.3%</div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -788,7 +873,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
     <div class="wrap">
       <div class="sec-head reveal">
         <div class="sec-label">RECOMMENDATIONS</div>
-        <div class="sec-num">06 / 07</div>
+        <div class="sec-num">07 / 08</div>
         <h2 class="sec-title">结论与建议</h2>
         <p class="sec-desc">从模型选型、评测方法与后续工作三个角度给出可执行建议。</p>
       </div>
@@ -798,7 +883,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
         <div class="p-card" style="--c:#0b93b8">
           <div class="k">SCORE FIRST</div>
           <h3>kimi-k3.1-pro</h3>
-          <p>追求指令遵循分数，且能接受异步 / 重试架构。修正后 83.3%，repeat 与 custom 双料第一。</p>
+          <p>追求指令遵循分数，且能接受异步 / 重试架构。榜面 73.0% 居首，repeat 88.9% 与 custom 81.8% 双料第一；与另两强的差距不显著。</p>
           <div class="why">需要异步重试架构</div>
         </div>
         <div class="p-card" style="--c:#2f9e44">
@@ -841,7 +926,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
     <div class="wrap">
       <div class="sec-head reveal">
         <div class="sec-label">APPENDIX</div>
-        <div class="sec-num">07 / 07</div>
+        <div class="sec-num">08 / 08</div>
         <h2 class="sec-title">附录：评测环境与复现</h2>
         <p class="sec-desc">记录完整评测环境、工具链与复现路径，确保全部结论可复现、可审计。</p>
       </div>
@@ -875,7 +960,7 @@ footer{position:relative;z-index:2;margin-top:80px;border-top:1px solid #e3ecf8;
           <div class="finding reveal" style="margin-top:14px;border-color:#f2ddb4;background:linear-gradient(160deg,#fffaf0,#fff 80%)">
             <div class="fnum" style="color:#b45309">LIMITATIONS</div>
             <h3 style="font-size:14.5px">局限性说明</h3>
-            <p>kimi 两个跑次首轮有 61 / 31 条空回复，经 600 秒与 900 秒两轮补跑后仍残留 37 / 22 条，其 strict / loose 分数为下界；修正估计（按已答题）存在「超时题目偏难」的选择偏差，实际水平介于榜单分数与修正估计之间。</p>
+            <p>kimi 两个跑次首轮有 61 / 31 条空回复，经 600 秒与 900 秒两轮补跑后仍残留 37 / 22 条，其 strict / loose 分数为下界；按已答题折算的分数存在「超时题目偏难」的选择偏差，仅作内部参考，本文不展示。</p>
           </div>
         </div>
       </div>
@@ -915,24 +1000,24 @@ const FAM = {
 };
 
 const MODELS = [
-  {r:1,  name:'kimi-k3.1-pro',        fam:'Kimi',     loose:73.0, strict:66.3, instr:73.0, valid:'263/300', timeout:12.3, hot:true},
-  {r:2,  name:'kimi-k3',              fam:'Kimi',     loose:72.3, strict:69.3, instr:73.8, valid:'278/300', timeout:7.3,  hot:true},
-  {r:3,  name:'MiniMax-M2.5',         fam:'MiniMax',  loose:71.3, strict:69.3, instr:72.7, valid:'300/300', timeout:0,    hot:true},
-  {r:4,  name:'glm-5.3',              fam:'GLM',      loose:66.7, strict:59.7, instr:68.3, valid:'300/300', timeout:0,    hot:true},
-  {r:5,  name:'qwen3.7-max',          fam:'Qwen',     loose:51.7, strict:51.0, instr:54.7, valid:'300/300', timeout:0},
-  {r:6,  name:'qwen3.7-plus',         fam:'Qwen',     loose:50.7, strict:48.0, instr:54.1, valid:'300/300', timeout:0},
-  {r:7,  name:'qwen3.8-max-0902',     fam:'Qwen',     loose:48.3, strict:46.0, instr:50.9, valid:'300/300', timeout:0},
-  {r:8,  name:'qwen3.8-flash',        fam:'Qwen',     loose:47.3, strict:43.3, instr:50.0, valid:'300/300', timeout:0},
-  {r:9,  name:'deepseek-v4-pro',     fam:'DeepSeek', loose:46.7, strict:44.3, instr:50.3, valid:'300/300', timeout:0},
-  {r:10, name:'deepseek-flash',       fam:'DeepSeek', loose:46.7, strict:43.7, instr:50.6, valid:'300/300', timeout:0},
-  {r:11, name:'deepseek-chat',        fam:'DeepSeek', loose:45.3, strict:42.7, instr:48.3, valid:'300/300', timeout:0},
-  {r:12, name:'deepseek-v4-pro-0813', fam:'DeepSeek', loose:45.3, strict:40.0, instr:49.4, valid:'300/300', timeout:0},
-  {r:13, name:'qwen3.8-max',          fam:'Qwen',     loose:45.3, strict:42.7, instr:48.8, valid:'300/300', timeout:0},
-  {r:14, name:'deepseek-v4.1-flash-1017', fam:'DeepSeek', loose:45.0, strict:42.3, instr:48.6, valid:'300/300', timeout:0},
-  {r:15, name:'deepseek-v4.1-flash',  fam:'DeepSeek', loose:43.0, strict:40.7, instr:47.1, valid:'300/300', timeout:0},
-  {r:16, name:'qwen3.8-27b',          fam:'Qwen',     loose:43.0, strict:39.3, instr:44.8, valid:'300/300', timeout:0},
-  {r:17, name:'deepseek-v4-flash-0731', fam:'DeepSeek', loose:42.0, strict:36.3, instr:45.4, valid:'300/300', timeout:0},
-  {r:18, name:'qwen3.7-flash',        fam:'Qwen',     loose:40.3, strict:37.0, instr:43.0, valid:'300/300', timeout:0}
+  {r:1,  name:'kimi-k3.1-pro',        fam:'Kimi',     loose:73.0, strict:66.3, instr:73.0, valid:'263/300', timeout:12.3, ci:[68.0,78.0]},
+  {r:2,  name:'kimi-k3',              fam:'Kimi',     loose:72.3, strict:69.3, instr:73.8, valid:'278/300', timeout:7.3,  ci:[67.3,77.3]},
+  {r:3,  name:'MiniMax-M2.5',         fam:'MiniMax',  loose:71.3, strict:69.3, instr:72.7, valid:'300/300', timeout:0,    ci:[66.0,76.3]},
+  {r:4,  name:'glm-5.3',              fam:'GLM',      loose:66.7, strict:59.7, instr:68.3, valid:'300/300', timeout:0,    ci:[61.3,72.0]},
+  {r:5,  name:'qwen3.7-max',          fam:'Qwen',     loose:51.7, strict:51.0, instr:54.7, valid:'300/300', timeout:0,    ci:[46.3,57.3]},
+  {r:6,  name:'qwen3.7-plus',         fam:'Qwen',     loose:50.3, strict:48.3, instr:54.1, valid:'300/300', timeout:0,    ci:[44.7,56.0]},
+  {r:7,  name:'qwen3.8-max-0902',     fam:'Qwen',     loose:48.3, strict:46.0, instr:50.9, valid:'300/300', timeout:0,    ci:[43.0,54.0]},
+  {r:8,  name:'qwen3.8-flash',        fam:'Qwen',     loose:47.3, strict:43.3, instr:50.0, valid:'300/300', timeout:0,    ci:[41.7,53.0]},
+  {r:9,  name:'deepseek-v4-pro',      fam:'DeepSeek', loose:46.7, strict:44.3, instr:50.3, valid:'300/300', timeout:0,    ci:[41.0,52.3]},
+  {r:10, name:'deepseek-flash',       fam:'DeepSeek', loose:46.7, strict:43.7, instr:50.6, valid:'300/300', timeout:0,    ci:[41.0,52.3]},
+  {r:11, name:'deepseek-chat',        fam:'DeepSeek', loose:45.3, strict:42.7, instr:48.3, valid:'300/300', timeout:0,    ci:[39.7,51.0]},
+  {r:12, name:'deepseek-v4-pro-0813', fam:'DeepSeek', loose:45.3, strict:40.0, instr:49.4, valid:'300/300', timeout:0,    ci:[39.7,51.0]},
+  {r:13, name:'qwen3.8-max',          fam:'Qwen',     loose:45.3, strict:42.7, instr:48.8, valid:'300/300', timeout:0,    ci:[40.0,51.0]},
+  {r:14, name:'deepseek-v4.1-flash-1017', fam:'DeepSeek', loose:45.0, strict:42.3, instr:48.6, valid:'300/300', timeout:0, ci:[39.3,50.7]},
+  {r:15, name:'deepseek-v4.1-flash',  fam:'DeepSeek', loose:43.0, strict:40.7, instr:47.1, valid:'300/300', timeout:0,    ci:[37.3,48.7]},
+  {r:16, name:'qwen3.8-27b',          fam:'Qwen',     loose:43.0, strict:39.3, instr:44.8, valid:'300/300', timeout:0,    ci:[37.3,48.7]},
+  {r:17, name:'deepseek-v4-flash-0731', fam:'DeepSeek', loose:42.0, strict:36.3, instr:45.4, valid:'300/300', timeout:0,  ci:[36.7,47.7]},
+  {r:18, name:'qwen3.7-flash',        fam:'Qwen',     loose:40.3, strict:37.0, instr:43.0, valid:'300/300', timeout:0,    ci:[35.0,46.0]}
 ];
 
 const CATS = [
@@ -946,8 +1031,8 @@ const CATS = [
 ];
 
 const MATRIX = [
-  {name:'kimi-k3',       fam:'Kimi',    v:[92.3,72.7,77.6,68.2,66.7,67.9,59.6]},
-  {name:'kimi-k3.1-pro', fam:'Kimi',    v:[84.6,81.8,84.7,61.4,88.9,60.7,53.9]},
+  {name:'kimi-k3',       fam:'Kimi',    v:[93.8,72.7,77.6,68.2,66.7,71.4,59.6]},
+  {name:'kimi-k3.1-pro', fam:'Kimi',    v:[84.6,81.8,84.7,63.6,88.9,60.7,57.3]},
   {name:'MiniMax-M2.5',  fam:'MiniMax', v:[87.7,72.7,90.8,47.7,55.6,71.4,56.2]},
   {name:'glm-5.3',       fam:'GLM',     v:[76.9,45.5,71.4,47.7,55.6,75.0,70.8]},
   {name:'qwen3.7-max',   fam:'Qwen',    v:[73.8,54.5,82.7,29.5,11.1,53.6,27.0]},
@@ -972,6 +1057,7 @@ function renderRanks(){
       <div class="m"><span class="name" title="${m.name}">${m.name}</span><span class="badge" style="--c:${f.c}">${m.fam.toUpperCase()}</span></div>
       <div class="b"><div class="bar-track"><div class="bar-fill" data-w="${val}" style="width:0"></div></div></div>
       <div class="v">${val.toFixed(1)}<small>%</small></div>
+      <div class="ci">${m.ci[0].toFixed(1)}–${m.ci[1].toFixed(1)}</div>
       <div class="val">${m.valid}</div>
       <div class="t ${to?'warn':''}">${to?m.timeout.toFixed(1)+'%':'0.0%'}</div>
     </div>`;
